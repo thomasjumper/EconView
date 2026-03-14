@@ -1,0 +1,16 @@
+{
+  "name": "econview",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Real-time global economic intelligence dashboard with cinematic 3D interface",
+  "scripts": {
+    "dev": "pnpm --parallel -r run dev",
+    "dev:client": "pnpm --filter @econview/client dev",
+    "dev:server": "pnpm --filter @econview/server dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
