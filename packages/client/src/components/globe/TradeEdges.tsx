@@ -3,6 +3,8 @@ import * as THREE from 'three'
 import { Line } from '@react-three/drei'
 import type { LayoutNode } from '../../hooks/useForceLayout'
 import type { EconEdge } from '@econview/shared'
+import { useVisualMode } from '../../hooks/useVisualMode'
+import { useAppStore } from '../../store/useAppStore'
 
 interface TradeEdgesProps {
   nodes: LayoutNode[]
@@ -11,6 +13,9 @@ interface TradeEdgesProps {
 }
 
 export function TradeEdges({ nodes, edges, visible }: TradeEdgesProps) {
+  const modeOverrides = useVisualMode()
+  const arcOpacityMultiplier = useAppStore((s) => s.debug.arcOpacityMultiplier)
+
   const nodeMap = useMemo(
     () => new Map(nodes.map((n) => [n.id, n])),
     [nodes],
@@ -33,7 +38,8 @@ export function TradeEdges({ nodes, edges, visible }: TradeEdgesProps) {
 
         const curve = new THREE.QuadraticBezierCurve3(start, mid, end)
         const points = curve.getPoints(20)
-        const opacity = 0.08 + edge.weight * 0.2
+        const baseOpacity = 0.08 + edge.weight * 0.2
+        const opacity = Math.min(1.0, baseOpacity * modeOverrides.edgeOpacityMultiplier * arcOpacityMultiplier)
 
         return {
           points: points.map((p) => [p.x, p.y, p.z] as [number, number, number]),
@@ -42,7 +48,7 @@ export function TradeEdges({ nodes, edges, visible }: TradeEdgesProps) {
         }
       })
       .filter(Boolean) as { points: [number, number, number][]; opacity: number; id: string }[]
-  }, [edges, nodeMap, nodes, visible])
+  }, [edges, nodeMap, nodes, visible, modeOverrides.edgeOpacityMultiplier, arcOpacityMultiplier])
 
   if (!visible) return null
 
@@ -52,7 +58,7 @@ export function TradeEdges({ nodes, edges, visible }: TradeEdgesProps) {
         <Line
           key={id}
           points={points}
-          color="#00D4FF"
+          color={modeOverrides.edgeColor}
           lineWidth={1}
           transparent
           opacity={opacity}

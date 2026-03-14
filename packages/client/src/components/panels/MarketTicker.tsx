@@ -1,6 +1,9 @@
-import { MOCK_STOCKS, MOCK_CRYPTO } from '../../lib/mock-data'
+import { useStockPrices, useCryptoPrices } from '../../hooks/useMarketData'
 
 export function MarketTicker() {
+  const stocks = useStockPrices()
+  const crypto = useCryptoPrices()
+
   return (
     <div className="absolute top-14 right-4 w-64 max-h-[calc(100vh-120px)] overflow-y-auto pointer-events-auto">
       {/* Stocks */}
@@ -9,7 +12,7 @@ export function MarketTicker() {
           Markets
         </h3>
         <div className="space-y-1">
-          {MOCK_STOCKS.map((stock) => (
+          {stocks.map((stock) => (
             <div key={stock.symbol} className="flex justify-between items-center text-xs">
               <span className="font-mono text-slate-300 w-12">{stock.symbol}</span>
               <span className="font-mono text-white">
@@ -37,7 +40,7 @@ export function MarketTicker() {
           Crypto
         </h3>
         <div className="space-y-1">
-          {MOCK_CRYPTO.map((coin) => (
+          {crypto.map((coin) => (
             <div key={coin.id} className="flex justify-between items-center text-xs">
               <span className="font-mono text-slate-300 w-10">{coin.symbol}</span>
               <span className="font-mono text-white">

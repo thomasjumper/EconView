@@ -29,3 +29,15 @@ html, body, #root {
   background: rgba(0, 212, 255, 0.3);
   border-radius: 2px;
 }
+
+/* Mode flash animation */
+@keyframes mode-flash {
+  0% { opacity: 0; transform: scale(0.8); }
+  20% { opacity: 0.8; transform: scale(1.0); }
+  80% { opacity: 0.8; transform: scale(1.0); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
+.animate-mode-flash {
+  animation: mode-flash 1.5s ease-out forwards;
+}

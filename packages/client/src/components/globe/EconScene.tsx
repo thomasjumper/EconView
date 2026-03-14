@@ -1,17 +1,79 @@
+import { useEffect, useState, useCallback } from 'react'
 import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom, FXAA } from '@react-three/postprocessing'
 import { Starfield } from './Starfield'
-import { CountryNodes } from './CountryNodes'
+import { EarthGlobe } from './EarthGlobe'
+import { DrillDownNodes } from './DrillDownNodes'
 import { TradeEdges } from './TradeEdges'
-import { useForceLayout } from '../../hooks/useForceLayout'
+import { FlowParticles } from './FlowParticles'
+import { ShaderModes } from './ShaderModes'
+import { useForceLayout, type LayoutNode } from '../../hooks/useForceLayout'
+import { useVisualMode } from '../../hooks/useVisualMode'
 import { useAppStore } from '../../store/useAppStore'
-import { MOCK_COUNTRIES, MOCK_TRADE_EDGES } from '../../lib/mock-data'
+import { useGDPCountries } from '../../hooks/useGDPData'
+import { useZoomTransition } from '../../hooks/useZoomTransition'
+import { getNodesForZoom, getEdgesForZoom } from '../../lib/market-data'
+import { MOCK_TRADE_EDGES } from '../../lib/mock-data'
 
 function SceneContent() {
   const showTradeArcs = useAppStore((s) => s.showTradeArcs)
-  const layoutNodes = useForceLayout(MOCK_COUNTRIES, MOCK_TRADE_EDGES)
+  const zoomLevel = useAppStore((s) => s.zoomLevel)
+  const zoomPath = useAppStore((s) => s.zoomPath)
+  const zoomOut = useAppStore((s) => s.zoomOut)
+  const visualMode = useAppStore((s) => s.visualMode)
+  const debug = useAppStore((s) => s.debug)
+
+  const modeOverrides = useVisualMode()
+
+  const countryNodes = useGDPCountries()
+
+  // Get nodes appropriate for current zoom level
+  const currentNodes = getNodesForZoom(zoomLevel, zoomPath, countryNodes)
+  const currentEdges = getEdgesForZoom(zoomLevel, MOCK_TRADE_EDGES)
+
+  const layoutNodes = useForceLayout(currentNodes, currentEdges)
+
+  // Track the last clicked node position for camera animation
+  const [clickedPos, setClickedPos] = useState<{ x: number; y: number; z: number } | null>(null)
+
+  const handleNodeClick = useCallback((node: LayoutNode) => {
+    setClickedPos({ x: node.x, y: node.y, z: node.z })
+  }, [])
+
+  // Camera transitions
+  useZoomTransition(clickedPos)
+
+  // ESC key to zoom out
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        zoomOut()
+        setClickedPos(null)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [zoomOut])
+
+  // Determine edge visibility
+  const edgesVisible =
+    modeOverrides.forceShowEdges
+      ? zoomLevel === 'global'
+      : showTradeArcs && zoomLevel === 'global'
+
+  // Determine flow particle visibility
+  const flowParticlesVisible =
+    zoomLevel === 'global' && (visualMode === 'flow' || (showTradeArcs && visualMode === 'default'))
+
+  // Bloom values: combine debug settings with mode overrides
+  const bloomIntensity = debug.bloomIntensity !== 0.8
+    ? debug.bloomIntensity
+    : modeOverrides.bloomIntensity
+  const bloomThreshold = debug.bloomThreshold !== 0.2
+    ? debug.bloomThreshold
+    : modeOverrides.bloomThreshold
 
   return (
     <>
@@ -24,7 +86,7 @@ function SceneContent() {
       <OrbitControls
         enableDamping
         dampingFactor={0.05}
-        minDistance={10}
+        minDistance={5}
         maxDistance={120}
         enablePan
         panSpeed={0.5}
@@ -34,22 +96,35 @@ function SceneContent() {
       {/* Background */}
       <Starfield count={2500} />
 
-      {/* Data nodes */}
-      <CountryNodes nodes={layoutNodes} />
+      {/* Earth globe (visible at global zoom only) */}
+      <EarthGlobe visible={zoomLevel === 'global'} />
+
+      {/* Data nodes — DrillDownNodes handles all zoom levels */}
+      <DrillDownNodes nodes={layoutNodes} onNodeClick={handleNodeClick} />
 
       {/* Trade edges */}
       <TradeEdges
         nodes={layoutNodes}
-        edges={MOCK_TRADE_EDGES}
-        visible={showTradeArcs}
+        edges={currentEdges}
+        visible={edgesVisible}
       />
+
+      {/* Flow particles along trade edges */}
+      <FlowParticles
+        nodes={layoutNodes}
+        edges={currentEdges}
+        visible={flowParticlesVisible}
+      />
+
+      {/* Visual mode overlays (vignette effects etc.) */}
+      <ShaderModes />
 
       {/* Post-processing */}
       <EffectComposer>
         <Bloom
-          luminanceThreshold={0.2}
+          luminanceThreshold={bloomThreshold}
           luminanceSmoothing={0.9}
-          intensity={0.8}
+          intensity={bloomIntensity}
         />
         <FXAA />
       </EffectComposer>

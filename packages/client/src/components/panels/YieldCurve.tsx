@@ -1,12 +1,13 @@
 import { useRef, useEffect } from 'react'
 import * as d3 from 'd3'
-import { MOCK_YIELDS } from '../../lib/mock-data'
+import { useYieldData } from '../../hooks/useYieldData'
 
 const maturities = ['2Y', '5Y', '10Y', '30Y'] as const
 const maturityYears = [2, 5, 10, 30]
 
 export function YieldCurve() {
   const svgRef = useRef<SVGSVGElement>(null)
+  const yields = useYieldData()
 
   useEffect(() => {
     if (!svgRef.current) return
@@ -28,9 +29,9 @@ export function YieldCurve() {
 
     const x = d3.scaleLinear().domain([2, 30]).range([0, innerW])
     const allYields = [
-      ...Object.values(MOCK_YIELDS.current),
-      ...Object.values(MOCK_YIELDS.oneYearAgo),
-      ...Object.values(MOCK_YIELDS.twoYearsAgo),
+      ...Object.values(yields.current),
+      ...Object.values(yields.oneYearAgo),
+      ...Object.values(yields.twoYearsAgo),
     ]
     const y = d3
       .scaleLinear()
@@ -114,12 +115,12 @@ export function YieldCurve() {
       }
     }
 
-    drawCurve(MOCK_YIELDS.twoYearsAgo, '#64748b', 0.4, true)
-    drawCurve(MOCK_YIELDS.oneYearAgo, '#F59E0B', 0.5, true)
-    drawCurve(MOCK_YIELDS.current, '#00D4FF', 1.0, false)
+    drawCurve(yields.twoYearsAgo, '#64748b', 0.4, true)
+    drawCurve(yields.oneYearAgo, '#F59E0B', 0.5, true)
+    drawCurve(yields.current, '#00D4FF', 1.0, false)
 
     // Inversion warning
-    const spread = MOCK_YIELDS.current['10Y'] - MOCK_YIELDS.current['2Y']
+    const spread = yields.current['10Y'] - yields.current['2Y']
     if (spread < 0) {
       g.append('text')
         .attr('x', innerW)
@@ -130,7 +131,7 @@ export function YieldCurve() {
         .attr('font-family', 'JetBrains Mono, monospace')
         .text(`INVERTED (${spread.toFixed(2)}%)`)
     }
-  }, [])
+  }, [yields])
 
   return (
     <div className="bg-black/60 backdrop-blur-xl border border-white/5 rounded-lg p-3">
@@ -139,7 +140,7 @@ export function YieldCurve() {
           US Treasury Yield Curve
         </h3>
         <span className="text-[9px] font-mono text-slate-600">
-          Fed Funds: {MOCK_YIELDS.fedFunds.toFixed(2)}%
+          Fed Funds: {yields.fedFunds.toFixed(2)}%
         </span>
       </div>
       <div className="flex gap-3 mb-1">
