@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
+import { useTexture } from '@react-three/drei'
 
 // ── Simplified country boundary arcs (lat/lon pairs for major landmass outlines) ──
 // Stored as [lon, lat] pairs, grouped into polylines
@@ -80,8 +81,11 @@ const globeFragmentShader = `
     float sunDot = dot(vNormal, uSunDirection);
     float dayFactor = smoothstep(-0.1, 0.3, sunDot);
 
-    // Day side: dark ocean/landmass base
-    vec3 dayColor = vec3(0.02, 0.04, 0.08);
+    // Day side: visible ocean blue / land green-brown
+    vec3 oceanColor = vec3(0.02, 0.08, 0.18);
+    vec3 landColor = vec3(0.06, 0.12, 0.05);
+    float landMaskDay = smoothstep(0.38, 0.58, noise(vUv * 8.0 + vec2(3.0, 7.0)));
+    vec3 dayColor = mix(oceanColor, landColor, landMaskDay) * (0.4 + dayFactor * 0.6);
 
     // Night side: faint city lights
     float cityNoise = noise(vUv * 120.0) * noise(vUv * 60.0 + 5.0);
@@ -89,7 +93,7 @@ const globeFragmentShader = `
     // Concentrate lights in "land" regions using coarse noise
     float landMask = smoothstep(0.35, 0.55, noise(vUv * 8.0 + vec2(3.0, 7.0)));
     float cityLights = cityNoise * landMask * (1.0 - dayFactor);
-    vec3 nightGlow = vec3(1.0, 0.85, 0.5) * cityLights * 0.4;
+    vec3 nightGlow = vec3(1.0, 0.85, 0.5) * cityLights * 0.8;
 
     // Subtle latitude grid lines
     float latLine = abs(sin(vUv.y * 3.14159 * 12.0));
@@ -98,13 +102,18 @@ const globeFragmentShader = `
     lonLine = smoothstep(0.97, 1.0, lonLine) * 0.03;
     float grid = max(latLine, lonLine);
 
-    vec3 finalColor = dayColor + nightGlow + vec3(grid) * vec3(0.1, 0.2, 0.4);
+    vec3 finalColor = dayColor + nightGlow + vec3(grid) * vec3(0.15, 0.3, 0.5);
 
     // Slight terminator glow
-    float terminatorGlow = exp(-pow((sunDot + 0.05) * 8.0, 2.0)) * 0.15;
-    finalColor += vec3(0.1, 0.15, 0.3) * terminatorGlow;
+    float terminatorGlow = exp(-pow((sunDot + 0.05) * 8.0, 2.0)) * 0.2;
+    finalColor += vec3(0.1, 0.2, 0.4) * terminatorGlow;
 
-    gl_FragColor = vec4(finalColor, 0.35);
+    // Edge darkening for depth
+    vec3 viewDir = normalize(-vPosition);
+    float rimDark = pow(1.0 - max(dot(viewDir, vNormal), 0.0), 2.0);
+    finalColor *= 1.0 - rimDark * 0.3;
+
+    gl_FragColor = vec4(finalColor, 0.92);
   }
 `
 
@@ -221,7 +230,7 @@ export function EarthGlobe({ visible }: EarthGlobeProps) {
         <lineBasicMaterial
           color="#00D4FF"
           transparent
-          opacity={0.12}
+          opacity={0.35}
           depthWrite={false}
         />
       </lineSegments>
