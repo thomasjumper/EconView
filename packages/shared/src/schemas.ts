@@ -67,16 +67,85 @@ export const EconNodeSchema = z.object({
   price: z.number().optional(),
   change24h: z.number().optional(),
   volume: z.number().optional(),
+  region: z.string().optional(),
+  currency: z.string().optional(),
+  inflation: z.number().optional(),
+  unemployment: z.number().optional(),
+  debtToGdp: z.number().optional(),
+  tradeBalance: z.number().optional(),
+  interestRate: z.number().optional(),
+  creditRating: z.string().optional(),
+  hdi: z.number().optional(),
 })
 
 export const EconEdgeSchema = z.object({
   id: z.string(),
   source: z.string(),
   target: z.string(),
-  type: z.enum(['trade', 'capital_flow', 'currency_pair', 'supply_chain', 'ownership', 'sector_membership']),
+  type: z.enum(['trade', 'capital_flow', 'currency_pair', 'supply_chain', 'ownership', 'sector_membership', 'remittance', 'fdi', 'debt']),
   weight: z.number(),
   value: z.number().optional(),
   direction: z.enum(['bidirectional', 'source_to_target', 'target_to_source']).optional(),
+})
+
+// ── New data source schemas ────────────────────────────────────────────
+
+// Commodity data
+export const CommoditySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  category: z.enum(['energy', 'metals', 'agriculture', 'livestock']),
+  unit: z.string(),
+  price: z.number(),
+  change24h: z.number(),
+  currency: z.string(),
+})
+
+// Forex pair
+export const ForexPairSchema = z.object({
+  id: z.string(),
+  base: z.string(),
+  quote: z.string(),
+  rate: z.number(),
+  change24h: z.number(),
+  volume24h: z.number().optional(),
+})
+
+// Sovereign bond yield
+export const SovereignBondSchema = z.object({
+  country: z.string(),
+  countryCode: z.string(),
+  tenor: z.string(),
+  yield: z.number(),
+  change: z.number(),
+  spread: z.number().optional(),
+})
+
+// Central bank data
+export const CentralBankSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  country: z.string(),
+  countryCode: z.string(),
+  policyRate: z.number(),
+  lastChange: z.number(),
+  lastChangeDate: z.string(),
+  nextMeetingDate: z.string().optional(),
+  inflationTarget: z.number().optional(),
+  balanceSheet: z.number().optional(),
+})
+
+// Economic indicator
+export const EconomicIndicatorSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  category: z.enum(['growth', 'inflation', 'employment', 'trade', 'monetary', 'fiscal', 'housing', 'manufacturing', 'consumer', 'shipping']),
+  value: z.number(),
+  previousValue: z.number().optional(),
+  unit: z.string(),
+  country: z.string().optional(),
+  source: z.string(),
+  lastUpdated: z.string(),
 })
 
 // Inferred types from schemas
