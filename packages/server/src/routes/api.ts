@@ -8,6 +8,9 @@ import { computeMarketRisk, computeRecessionProbability } from '../services/risk
 import { getActiveAlerts } from '../services/alerts.js'
 import { processQuery } from '../services/ai-query.js'
 import type { MarketContext } from '../services/ai-query.js'
+import { fetchCommodities, fetchCommoditiesByCategory } from '../services/commodities.js'
+import { fetchForexRates } from '../services/forex.js'
+import { fetchIndicators } from '../services/global-indicators.js'
 
 const router: RouterType = Router()
 
@@ -229,6 +232,70 @@ router.post('/api/query', async (req, res) => {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error('[API] /api/query error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Commodities
+// ---------------------------------------------------------------------------
+
+router.get('/api/commodities', async (_req, res) => {
+  try {
+    const data = await fetchCommodities()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/commodities error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+router.get('/api/commodities/:category', async (req, res) => {
+  try {
+    const { category } = req.params
+    const validCategories = ['energy', 'precious_metals', 'industrial_metals', 'agriculture', 'livestock']
+    if (!validCategories.includes(category)) {
+      res.status(400).json({ ok: false, error: `Invalid category. Must be one of: ${validCategories.join(', ')}` })
+      return
+    }
+    const data = await fetchCommoditiesByCategory(category)
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/commodities/:category error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Forex
+// ---------------------------------------------------------------------------
+
+router.get('/api/forex', async (_req, res) => {
+  try {
+    const data = await fetchForexRates()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/forex error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Economic Indicators
+// ---------------------------------------------------------------------------
+
+router.get('/api/indicators', async (req, res) => {
+  try {
+    const category = req.query.category as string | undefined
+    const country = req.query.country as string | undefined
+    const data = await fetchIndicators(category, country)
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/indicators error:', message)
     res.status(500).json({ ok: false, error: message })
   }
 })

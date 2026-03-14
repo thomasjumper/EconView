@@ -4,13 +4,16 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "outDir": "dist",
-    "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "declaration": true
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "@econview/shared": ["../shared/src/index.ts"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "../shared/src"]
 }

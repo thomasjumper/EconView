@@ -42,9 +42,9 @@ export function useForceLayout(
       return {
         ...n,
         size: (0.3 + logSize * 1.5) * nodeScaleMultiplier,
-        x: (Math.random() - 0.5) * 50,
-        y: (Math.random() - 0.5) * 50,
-        z: (Math.random() - 0.5) * 50,
+        x: (Math.random() - 0.5) * 15,
+        y: (Math.random() - 0.5) * 15,
+        z: (Math.random() - 0.5) * 15,
       }
     })
 

@@ -22,13 +22,22 @@ export interface EconNode {
   color?: string
   children?: string[]
   parent?: string
+  region?: string
+  currency?: string
+  inflation?: number
+  unemployment?: number
+  debtToGdp?: number
+  tradeBalance?: number
+  interestRate?: number
+  creditRating?: string
+  hdi?: number
 }
 
 export interface EconEdge {
   id: string
   source: string
   target: string
-  type: 'trade' | 'capital_flow' | 'currency_pair' | 'supply_chain' | 'ownership' | 'sector_membership'
+  type: 'trade' | 'capital_flow' | 'currency_pair' | 'supply_chain' | 'ownership' | 'sector_membership' | 'remittance' | 'fdi' | 'debt'
   weight: number
   value?: number
   direction?: 'bidirectional' | 'source_to_target' | 'target_to_source'
@@ -55,3 +64,74 @@ export const GICS_SECTORS = {
   utilities: { label: 'Utilities', color: '#EF4444' },
   real_estate: { label: 'Real Estate', color: '#A855F7' },
 } as const
+
+// ---------------------------------------------------------------------------
+// Commodity, Forex, Bond, CentralBank, Indicator, Exchange, Region types
+// ---------------------------------------------------------------------------
+
+export interface Commodity {
+  id: string
+  name: string
+  category: 'energy' | 'precious_metals' | 'industrial_metals' | 'agriculture' | 'livestock'
+  price: number
+  change24h: number
+  unit: string
+  symbol?: string
+}
+
+export interface ForexPair {
+  id: string
+  base: string
+  quote: string
+  rate: number
+  change24h: number
+  category: 'g10' | 'cross' | 'em' | 'crypto_fiat'
+}
+
+export interface SovereignBond {
+  countryCode: string
+  country: string
+  yield2Y?: number
+  yield5Y?: number
+  yield10Y: number
+  yield30Y?: number
+  spreadVsUS?: number
+}
+
+export interface CentralBank {
+  id: string
+  name: string
+  abbreviation: string
+  countryCode: string
+  policyRate: number
+  lastChange: string
+  inflationTarget?: number
+}
+
+export interface EconomicIndicator {
+  id: string
+  name: string
+  category: 'manufacturing' | 'inflation' | 'employment' | 'trade' | 'consumer' | 'housing' | 'shipping' | 'volatility'
+  value: number
+  previousValue?: number
+  unit: string
+  country?: string
+  lastUpdated: string
+}
+
+export interface ExchangeDef {
+  id: string
+  name: string
+  countryCode: string
+  region: string
+  marketCap: number
+  currency: string
+  timezone: string
+}
+
+export interface WorldRegion {
+  id: string
+  name: string
+  color: string
+  countries: string[]
+}

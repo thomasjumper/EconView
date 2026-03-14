@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { Html } from '@react-three/drei'
 import type { LayoutNode } from '../../hooks/useForceLayout'
 import { useAppStore } from '../../store/useAppStore'
@@ -16,6 +16,13 @@ interface RiskReticlesProps {
 export function RiskReticles({ nodes }: RiskReticlesProps) {
   const visualMode = useAppStore((s) => s.visualMode)
 
+  useEffect(() => {
+    const styleEl = document.createElement('style')
+    styleEl.textContent = reticleStyle
+    document.head.appendChild(styleEl)
+    return () => { document.head.removeChild(styleEl) }
+  }, [])
+
   // Top 5 highest-risk nodes (lowest/most negative gdpGrowth)
   const riskNodes = useMemo(() => {
     if (visualMode !== 'risk' || nodes.length === 0) return []
@@ -28,7 +35,6 @@ export function RiskReticles({ nodes }: RiskReticlesProps) {
 
   return (
     <>
-      <style>{reticleStyle}</style>
       {riskNodes.map((node) => {
         const riskLevel = Math.abs(node.gdpGrowth ?? 0)
         const size = Math.max(40, Math.min(80, 40 + riskLevel * 8))

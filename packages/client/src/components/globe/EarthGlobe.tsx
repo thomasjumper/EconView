@@ -80,8 +80,12 @@ const globeFragmentShader = `
     float sunDot = dot(vNormal, uSunDirection);
     float dayFactor = smoothstep(-0.1, 0.3, sunDot);
 
-    // Day side: dark ocean/landmass base
-    vec3 dayColor = vec3(0.02, 0.04, 0.08);
+    // Procedural ocean vs land
+    float landNoise = noise(vUv * 8.0 + vec2(3.0, 7.0));
+    float isLand = smoothstep(0.35, 0.55, landNoise);
+    vec3 oceanColor = vec3(0.01, 0.03, 0.12) * (0.5 + 0.5 * dayFactor);
+    vec3 landColor = vec3(0.04, 0.06, 0.03) * (0.5 + 0.5 * dayFactor);
+    vec3 dayColor = mix(oceanColor, landColor, isLand);
 
     // Night side: faint city lights
     float cityNoise = noise(vUv * 120.0) * noise(vUv * 60.0 + 5.0);
@@ -89,7 +93,7 @@ const globeFragmentShader = `
     // Concentrate lights in "land" regions using coarse noise
     float landMask = smoothstep(0.35, 0.55, noise(vUv * 8.0 + vec2(3.0, 7.0)));
     float cityLights = cityNoise * landMask * (1.0 - dayFactor);
-    vec3 nightGlow = vec3(1.0, 0.85, 0.5) * cityLights * 0.4;
+    vec3 nightGlow = vec3(1.0, 0.85, 0.5) * cityLights * 0.8;
 
     // Subtle latitude grid lines
     float latLine = abs(sin(vUv.y * 3.14159 * 12.0));
@@ -104,7 +108,13 @@ const globeFragmentShader = `
     float terminatorGlow = exp(-pow((sunDot + 0.05) * 8.0, 2.0)) * 0.15;
     finalColor += vec3(0.1, 0.15, 0.3) * terminatorGlow;
 
-    gl_FragColor = vec4(finalColor, 0.35);
+    // Rim darkening (edges of sphere)
+    vec3 viewDir = normalize(-vPosition);
+    float rimDot = dot(viewDir, vNormal);
+    float rimDarken = smoothstep(0.0, 0.4, rimDot);
+    finalColor *= rimDarken;
+
+    gl_FragColor = vec4(finalColor, 0.92);
   }
 `
 
@@ -221,7 +231,7 @@ export function EarthGlobe({ visible }: EarthGlobeProps) {
         <lineBasicMaterial
           color="#00D4FF"
           transparent
-          opacity={0.12}
+          opacity={0.35}
           depthWrite={false}
         />
       </lineSegments>

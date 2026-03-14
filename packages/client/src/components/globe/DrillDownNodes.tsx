@@ -120,6 +120,7 @@ interface DrillDownNodesProps {
 
 export function DrillDownNodes({ nodes, onNodeClick }: DrillDownNodesProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null!)
+  const colorAttrRef = useRef<THREE.InstancedBufferAttribute | null>(null)
   const zoomLevel = useAppStore((s) => s.zoomLevel)
   const hoveredNodeId = useAppStore((s) => s.hoveredNodeId)
   const setHoveredNodeId = useAppStore((s) => s.setHoveredNodeId)
@@ -130,7 +131,10 @@ export function DrillDownNodes({ nodes, onNodeClick }: DrillDownNodesProps) {
   const modeOverrides = useVisualMode()
 
   const dummy = useMemo(() => new THREE.Object3D(), [])
-  const colorArray = useMemo(() => new Float32Array(Math.max(nodes.length, 1) * 3), [nodes.length])
+  const colorArray = useMemo(() => {
+    colorAttrRef.current = null // Reset when node count changes
+    return new Float32Array(Math.max(nodes.length, 1) * 3)
+  }, [nodes.length])
 
   useFrame(() => {
     if (!meshRef.current || nodes.length === 0) return
@@ -161,10 +165,13 @@ export function DrillDownNodes({ nodes, onNodeClick }: DrillDownNodesProps) {
     }
 
     meshRef.current.instanceMatrix.needsUpdate = true
-    meshRef.current.geometry.setAttribute(
-      'color',
-      new THREE.InstancedBufferAttribute(colorArray, 3),
-    )
+    if (!colorAttrRef.current) {
+      colorAttrRef.current = new THREE.InstancedBufferAttribute(colorArray, 3)
+      meshRef.current.geometry.setAttribute('color', colorAttrRef.current)
+    } else {
+      colorAttrRef.current.array = colorArray
+      colorAttrRef.current.needsUpdate = true
+    }
   })
 
   const handlePointerOver = useCallback(

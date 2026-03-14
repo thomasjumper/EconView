@@ -16,8 +16,8 @@ const DEFAULT_DEBUG: DebugSettings = {
   bloomIntensity: 0.8,
   bloomThreshold: 0.2,
   arcOpacityMultiplier: 1.0,
-  forceChargeStrength: -120,
-  forceLinkDistance: 8,
+  forceChargeStrength: -30,
+  forceLinkDistance: 5,
   nodeScaleMultiplier: 1.0,
 }
 
