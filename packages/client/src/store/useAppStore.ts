@@ -35,6 +35,9 @@ interface AppState {
   showPerformanceDashboard: boolean
   showKeyboardHelp: boolean
   showScanLines: boolean
+  showCalendar: boolean
+  showCreditPanel: boolean
+  showDeFiPanel: boolean
   compareNodes: string[]
   voiceEnabled: boolean
 
@@ -50,6 +53,9 @@ interface AppState {
   togglePerformanceDashboard: () => void
   toggleKeyboardHelp: () => void
   toggleScanLines: () => void
+  toggleCalendar: () => void
+  toggleCreditPanel: () => void
+  toggleDeFiPanel: () => void
   setCompareNodes: (ids: string[]) => void
   toggleVoice: () => void
   drillDown: (nodeId: string) => void
@@ -72,6 +78,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   showPerformanceDashboard: false,
   showKeyboardHelp: false,
   showScanLines: true,
+  showCalendar: false,
+  showCreditPanel: false,
+  showDeFiPanel: false,
   compareNodes: [],
   voiceEnabled: false,
 
@@ -87,6 +96,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   togglePerformanceDashboard: () => set((s) => ({ showPerformanceDashboard: !s.showPerformanceDashboard })),
   toggleKeyboardHelp: () => set((s) => ({ showKeyboardHelp: !s.showKeyboardHelp })),
   toggleScanLines: () => set((s) => ({ showScanLines: !s.showScanLines })),
+  toggleCalendar: () => set((s) => ({ showCalendar: !s.showCalendar })),
+  toggleCreditPanel: () => set((s) => ({ showCreditPanel: !s.showCreditPanel })),
+  toggleDeFiPanel: () => set((s) => ({ showDeFiPanel: !s.showDeFiPanel })),
   setCompareNodes: (ids) => set({ compareNodes: ids }),
   toggleVoice: () => set((s) => ({ voiceEnabled: !s.voiceEnabled })),
 

@@ -15,6 +15,9 @@ import { RiskDashboard } from './components/panels/RiskDashboard'
 import { PerformanceDashboard } from './components/panels/PerformanceDashboard'
 import { KeyboardHelp } from './components/ui/KeyboardHelp'
 import { ComparePanel } from './components/panels/ComparePanel'
+import { CalendarPanel } from './components/panels/CalendarPanel'
+import { CreditPanel } from './components/panels/CreditPanel'
+import { DeFiPanel } from './components/panels/DeFiPanel'
 import { ScanLines } from './components/ui/ScanLines'
 import { useReplayAnimation } from './hooks/useReplayAnimation'
 
@@ -51,6 +54,11 @@ export default function App() {
 
       {/* Compare Panel */}
       <ComparePanel />
+
+      {/* Tier 1+2 Data Panels */}
+      <CalendarPanel />
+      <CreditPanel />
+      <DeFiPanel />
 
       {/* Phase 5: Timeline / Historical Replay */}
       <TimelineScrubber />

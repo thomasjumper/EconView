@@ -135,3 +135,61 @@ export interface WorldRegion {
   color: string
   countries: string[]
 }
+
+// ---------------------------------------------------------------------------
+// Calendar Events (Finnhub)
+// ---------------------------------------------------------------------------
+
+export interface CalendarEvent {
+  date: string
+  type: 'earnings' | 'economic' | 'ipo' | 'central_bank'
+  title: string
+  country?: string
+  impact?: 'low' | 'medium' | 'high'
+  actual?: number
+  estimate?: number
+  ticker?: string
+}
+
+// ---------------------------------------------------------------------------
+// DeFi Overview (DefiLlama + Fear & Greed)
+// ---------------------------------------------------------------------------
+
+export interface DeFiOverview {
+  totalTVL: number
+  change24h: number
+  topProtocols: { name: string; tvl: number; change24h: number; chain: string }[]
+  stablecoins: {
+    totalSupply: number
+    breakdown: { name: string; supply: number; change7d: number }[]
+  }
+  fearGreed: { value: number; classification: string }
+}
+
+// ---------------------------------------------------------------------------
+// Tier 2: Supply Chain, Property, Conflict
+// ---------------------------------------------------------------------------
+
+export interface SupplyChainData {
+  date: string
+  gscpi: number
+  trend: 'improving' | 'worsening' | 'stable'
+  history: { date: string; value: number }[]
+}
+
+export interface PropertyPriceData {
+  countryCode: string
+  country: string
+  indexValue: number
+  yoyChange: number
+  lastQuarter: string
+}
+
+export interface ConflictData {
+  countryCode: string
+  country: string
+  conflictIntensity: number
+  eventCount30d: number
+  trend: 'escalating' | 'de-escalating' | 'stable'
+  primaryType: string
+}

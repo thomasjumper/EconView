@@ -1,6 +1,15 @@
 import { Router, type Router as RouterType } from 'express'
 import { fetchGDP } from '../services/worldbank.js'
-import { fetchYieldCurve } from '../services/fred.js'
+import {
+  fetchYieldCurve,
+  fetchCreditSpreads,
+  fetchYieldSpreads,
+  fetchFinancialConditions,
+  fetchMoneySupply,
+  fetchSentiment as fetchFredSentiment,
+  fetchLaborMarket,
+  fetchFiscalData,
+} from '../services/fred.js'
 import { getCompanyFinancials } from '../services/edgar.js'
 import { getHistoricalPrices, getHistoricalYields } from '../services/timescaledb.js'
 import { fetchNewsSentiment, fetchCountrySentiment, aggregateSentiment } from '../services/gdelt.js'
@@ -11,6 +20,18 @@ import type { MarketContext } from '../services/ai-query.js'
 import { fetchCommodities, fetchCommoditiesByCategory } from '../services/commodities.js'
 import { fetchForexRates } from '../services/forex.js'
 import { fetchIndicators } from '../services/global-indicators.js'
+import {
+  fetchFullCalendar,
+  fetchEarningsCalendar,
+  fetchEconomicCalendar,
+  fetchIPOCalendar,
+} from '../services/calendar.js'
+import { fetchDeFiOverview, fetchStablecoinSupply } from '../services/defi.js'
+import { fetchCryptoFearGreed } from '../services/fear-greed.js'
+import { fetchSupplyChainPressure } from '../services/supply-chain.js'
+import { fetchPropertyPrices } from '../services/property.js'
+import { fetchDevelopmentIndicators } from '../services/wb-indicators.js'
+import { fetchConflictData } from '../services/conflict.js'
 
 const router: RouterType = Router()
 
@@ -302,6 +323,256 @@ router.get('/api/indicators', async (req, res) => {
 })
 
 // ---------------------------------------------------------------------------
+// Credit Spreads (FRED)
+// ---------------------------------------------------------------------------
+
+router.get('/api/credit-spreads', async (_req, res) => {
+  try {
+    const data = await fetchCreditSpreads()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/credit-spreads error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Yield Spreads (FRED)
+// ---------------------------------------------------------------------------
+
+router.get('/api/yield-spreads', async (_req, res) => {
+  try {
+    const data = await fetchYieldSpreads()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/yield-spreads error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Financial Conditions (FRED)
+// ---------------------------------------------------------------------------
+
+router.get('/api/financial-conditions', async (_req, res) => {
+  try {
+    const data = await fetchFinancialConditions()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/financial-conditions error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Money Supply (FRED)
+// ---------------------------------------------------------------------------
+
+router.get('/api/money-supply', async (_req, res) => {
+  try {
+    const data = await fetchMoneySupply()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/money-supply error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Consumer / Business Sentiment (FRED)
+// ---------------------------------------------------------------------------
+
+router.get('/api/consumer-sentiment', async (_req, res) => {
+  try {
+    const data = await fetchFredSentiment()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/consumer-sentiment error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Labor Market (FRED)
+// ---------------------------------------------------------------------------
+
+router.get('/api/labor-market', async (_req, res) => {
+  try {
+    const data = await fetchLaborMarket()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/labor-market error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Fiscal Data (FRED)
+// ---------------------------------------------------------------------------
+
+router.get('/api/fiscal', async (_req, res) => {
+  try {
+    const data = await fetchFiscalData()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/fiscal error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Calendars (Finnhub)
+// ---------------------------------------------------------------------------
+
+router.get('/api/calendar', async (_req, res) => {
+  try {
+    const data = await fetchFullCalendar()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/calendar error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+router.get('/api/calendar/earnings', async (_req, res) => {
+  try {
+    const data = await fetchEarningsCalendar()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/calendar/earnings error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+router.get('/api/calendar/economic', async (_req, res) => {
+  try {
+    const data = await fetchEconomicCalendar()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/calendar/economic error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+router.get('/api/calendar/ipo', async (_req, res) => {
+  try {
+    const data = await fetchIPOCalendar()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/calendar/ipo error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// DeFi Overview (DefiLlama + Fear & Greed)
+// ---------------------------------------------------------------------------
+
+router.get('/api/defi', async (_req, res) => {
+  try {
+    const [overview, stablecoins, fearGreed] = await Promise.all([
+      fetchDeFiOverview(),
+      fetchStablecoinSupply(),
+      fetchCryptoFearGreed(),
+    ])
+    res.json({
+      ok: true,
+      data: {
+        ...overview,
+        stablecoins,
+        fearGreed,
+      },
+    })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/defi error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+router.get('/api/fear-greed', async (_req, res) => {
+  try {
+    const data = await fetchCryptoFearGreed()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/fear-greed error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Supply Chain Pressure (NY Fed GSCPI)
+// ---------------------------------------------------------------------------
+
+router.get('/api/supply-chain', async (_req, res) => {
+  try {
+    const data = await fetchSupplyChainPressure()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/supply-chain error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Property Prices (BIS Residential)
+// ---------------------------------------------------------------------------
+
+router.get('/api/property-prices', async (_req, res) => {
+  try {
+    const data = await fetchPropertyPrices()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/property-prices error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Development Indicators (World Bank)
+// ---------------------------------------------------------------------------
+
+router.get('/api/development', async (_req, res) => {
+  try {
+    const data = await fetchDevelopmentIndicators()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/development error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Conflict Data (ACLED-style)
+// ---------------------------------------------------------------------------
+
+router.get('/api/conflict', async (_req, res) => {
+  try {
+    const data = await fetchConflictData()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/conflict error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
 // Health check
 // ---------------------------------------------------------------------------
 
@@ -321,6 +592,12 @@ router.get('/api/health', (_req, res) => {
       commodities: 'available',
       forex: 'available',
       globalIndicators: 'available',
+      defiLlama: 'available',
+      fearGreed: 'available',
+      supplyChain: 'available',
+      propertyPrices: 'available',
+      developmentIndicators: 'available',
+      conflict: 'available',
     },
   })
 })
