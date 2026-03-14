@@ -14,6 +14,8 @@ import { AlertIndicators } from './components/ui/AlertIndicators'
 import { RiskDashboard } from './components/panels/RiskDashboard'
 import { PerformanceDashboard } from './components/panels/PerformanceDashboard'
 import { KeyboardHelp } from './components/ui/KeyboardHelp'
+import { ComparePanel } from './components/panels/ComparePanel'
+import { ScanLines } from './components/ui/ScanLines'
 import { useReplayAnimation } from './hooks/useReplayAnimation'
 
 export default function App() {
@@ -47,12 +49,18 @@ export default function App() {
       <RiskDashboard />
       <PerformanceDashboard />
 
+      {/* Compare Panel */}
+      <ComparePanel />
+
       {/* Phase 5: Timeline / Historical Replay */}
       <TimelineScrubber />
       <CrisisPresets />
 
       {/* Overlays */}
       <KeyboardHelp />
+
+      {/* Scan lines overlay (renders on top of everything) */}
+      <ScanLines />
     </div>
   )
 }

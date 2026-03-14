@@ -50,6 +50,8 @@ export function TopBar() {
   const zoomOut = useAppStore((s) => s.zoomOut)
   const showTradeArcs = useAppStore((s) => s.showTradeArcs)
   const toggleTradeArcs = useAppStore((s) => s.toggleTradeArcs)
+  const showScanLines = useAppStore((s) => s.showScanLines)
+  const toggleScanLines = useAppStore((s) => s.toggleScanLines)
 
   const countryNodes = useGDPCountries()
   const pathLabels = getZoomPathLabels(zoomPath, countryNodes)
@@ -127,6 +129,16 @@ export function TopBar() {
           }`}
         >
           TRADE FLOWS
+        </button>
+        <button
+          onClick={toggleScanLines}
+          className={`text-[10px] font-mono px-2 py-1 rounded border transition-colors ${
+            showScanLines
+              ? 'border-econ-blue/40 text-econ-blue bg-econ-blue/10'
+              : 'border-slate-700 text-slate-500 hover:text-slate-400'
+          }`}
+        >
+          SCAN
         </button>
         <div className="text-[10px] font-mono text-slate-600">
           {new Date().toLocaleTimeString('en-US', {

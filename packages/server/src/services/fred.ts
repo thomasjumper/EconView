@@ -14,6 +14,7 @@ interface FREDObservation {
 
 interface YieldCurveData {
   series: Record<YieldSeries, { date: string; value: number }[]>
+  dollarIndex: number | null
   lastUpdated: string
 }
 
@@ -67,12 +68,24 @@ export async function fetchYieldCurve(): Promise<YieldCurveData> {
       { date: string; value: number }[]
     >
 
+    // Fetch Dollar Index (Trade Weighted U.S. Dollar Index, Broad)
+    let dollarIndex: number | null = null
+    try {
+      const dxyObs = await fetchSeries('DTWEXBGS')
+      if (dxyObs.length > 0) {
+        dollarIndex = dxyObs[dxyObs.length - 1].value
+      }
+    } catch (err) {
+      console.error('[FRED] Failed to fetch DTWEXBGS:', (err as Error).message)
+    }
+
     console.log(
-      `[FRED] Fetched yield curve: ${YIELD_SERIES.map((s) => `${s}=${series[s].length}`).join(', ')}`,
+      `[FRED] Fetched yield curve: ${YIELD_SERIES.map((s) => `${s}=${series[s].length}`).join(', ')}, DXY=${dollarIndex ?? 'N/A'}`,
     )
 
     return {
       series,
+      dollarIndex,
       lastUpdated: new Date().toISOString(),
     }
   })

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import { useStockPrices } from '../../hooks/useMarketData'
 import { useRiskData } from '../../hooks/useRiskData'
+import { useYieldData } from '../../hooks/useYieldData'
 
 function ChangeBar({ symbol, change }: { symbol: string; change: number }) {
   const maxWidth = 80 // percent
@@ -38,6 +39,7 @@ export function PerformanceDashboard() {
   const toggle = useAppStore((s) => s.togglePerformanceDashboard)
   const stocks = useStockPrices()
   const { data: riskData } = useRiskData()
+  const yieldData = useYieldData()
 
   // Keyboard shortcut: "P" to toggle
   useEffect(() => {
@@ -71,6 +73,10 @@ export function PerformanceDashboard() {
   // Yield data from risk
   const fedFunds = riskData.market.fedFundsRate
   const yieldSpread = riskData.market.yieldSpread
+  const dollarIndex = yieldData.dollarIndex
+
+  // VIX proxy: look for UVXY or VXX in stock prices
+  const vixProxy = stocks.find((s) => s.symbol === 'UVXY' || s.symbol === 'VXX')
 
   return (
     <div className="absolute bottom-4 left-4 w-80 z-20 pointer-events-auto">
@@ -183,6 +189,30 @@ export function PerformanceDashboard() {
                 )}
               </div>
             </div>
+            {dollarIndex != null && (
+              <div className="flex justify-between text-[10px]">
+                <span className="text-slate-400">DXY (Dollar Index)</span>
+                <span className="font-mono text-slate-300">{dollarIndex.toFixed(2)}</span>
+              </div>
+            )}
+            {vixProxy && (
+              <div className="flex justify-between items-center text-[10px]">
+                <span className="text-slate-400">VIX Proxy ({vixProxy.symbol})</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-slate-300">
+                    {vixProxy.price.toFixed(2)}
+                  </span>
+                  <span
+                    className={`font-mono text-[9px] ${
+                      vixProxy.change >= 0 ? 'text-red-400' : 'text-green-400'
+                    }`}
+                  >
+                    {vixProxy.change >= 0 ? '+' : ''}
+                    {vixProxy.change.toFixed(2)}%
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

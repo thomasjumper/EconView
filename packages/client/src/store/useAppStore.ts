@@ -34,6 +34,9 @@ interface AppState {
   showCrisisPresets: boolean
   showPerformanceDashboard: boolean
   showKeyboardHelp: boolean
+  showScanLines: boolean
+  compareNodes: string[]
+  voiceEnabled: boolean
 
   setZoomLevel: (level: ZoomLevel) => void
   setFocusNodeId: (id: string | null) => void
@@ -46,6 +49,9 @@ interface AppState {
   toggleCrisisPresets: () => void
   togglePerformanceDashboard: () => void
   toggleKeyboardHelp: () => void
+  toggleScanLines: () => void
+  setCompareNodes: (ids: string[]) => void
+  toggleVoice: () => void
   drillDown: (nodeId: string) => void
   zoomOut: () => void
 }
@@ -65,6 +71,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   showCrisisPresets: false,
   showPerformanceDashboard: false,
   showKeyboardHelp: false,
+  showScanLines: true,
+  compareNodes: [],
+  voiceEnabled: false,
 
   setZoomLevel: (level) => set({ zoomLevel: level }),
   setFocusNodeId: (id) => set({ focusNodeId: id }),
@@ -77,6 +86,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   toggleCrisisPresets: () => set((s) => ({ showCrisisPresets: !s.showCrisisPresets })),
   togglePerformanceDashboard: () => set((s) => ({ showPerformanceDashboard: !s.showPerformanceDashboard })),
   toggleKeyboardHelp: () => set((s) => ({ showKeyboardHelp: !s.showKeyboardHelp })),
+  toggleScanLines: () => set((s) => ({ showScanLines: !s.showScanLines })),
+  setCompareNodes: (ids) => set({ compareNodes: ids }),
+  toggleVoice: () => set((s) => ({ voiceEnabled: !s.voiceEnabled })),
 
   drillDown: (nodeId) => {
     const { zoomLevel, zoomPath } = get()

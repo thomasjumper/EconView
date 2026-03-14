@@ -10,6 +10,7 @@ import { NetworkGraph } from './NetworkGraph'
 import { TradeEdges } from './TradeEdges'
 import { FlowParticles } from './FlowParticles'
 import { ShaderModes } from './ShaderModes'
+import { RiskReticles } from './RiskReticles'
 import { useForceLayout, type LayoutNode } from '../../hooks/useForceLayout'
 import { useGlobeLayout } from '../../hooks/useGlobeLayout'
 import { useVisualMode } from '../../hooks/useVisualMode'
@@ -134,6 +135,9 @@ function SceneContent() {
         edges={currentEdges}
         visible={flowParticlesVisible}
       />
+
+      {/* Risk reticles on high-risk nodes */}
+      <RiskReticles nodes={layoutNodes} />
 
       {/* Visual mode overlays (vignette effects etc.) */}
       <ShaderModes />

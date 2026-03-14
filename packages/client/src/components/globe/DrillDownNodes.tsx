@@ -24,8 +24,12 @@ function hexToColor(hex: string): THREE.Color {
   return new THREE.Color(hex)
 }
 
-function getNodeColor(node: LayoutNode, zoomLevel: ZoomLevel): THREE.Color {
+function getNodeColor(node: LayoutNode, zoomLevel: ZoomLevel, visualMode: string): THREE.Color {
   if (zoomLevel === 'global') {
+    // In default mode, use flag color if available
+    if (visualMode === 'default' && node.color) {
+      return hexToColor(node.color)
+    }
     return growthToColor(node.gdpGrowth ?? 0)
   }
   if (node.color) {
@@ -122,6 +126,7 @@ export function DrillDownNodes({ nodes, onNodeClick }: DrillDownNodesProps) {
   const setSelectedNode = useAppStore((s) => s.setSelectedNode)
   const drillDown = useAppStore((s) => s.drillDown)
   const nodeScaleMultiplier = useAppStore((s) => s.debug.nodeScaleMultiplier)
+  const visualMode = useAppStore((s) => s.visualMode)
   const modeOverrides = useVisualMode()
 
   const dummy = useMemo(() => new THREE.Object3D(), [])
@@ -148,7 +153,7 @@ export function DrillDownNodes({ nodes, onNodeClick }: DrillDownNodesProps) {
       dummy.updateMatrix()
       meshRef.current.setMatrixAt(i, dummy.matrix)
 
-      const baseColor = getNodeColor(node, zoomLevel)
+      const baseColor = getNodeColor(node, zoomLevel, visualMode)
       const color = modeOverrides.getNodeColor(baseColor, node.gdpGrowth ?? 0)
       colorArray[i * 3] = color.r
       colorArray[i * 3 + 1] = color.g
@@ -225,7 +230,13 @@ export function DrillDownNodes({ nodes, onNodeClick }: DrillDownNodesProps) {
         onPointerOut={handlePointerOut}
         onClick={handleClick}
       >
-        <sphereGeometry args={[1, 16, 16]} />
+        {zoomLevel === 'market' ? (
+          <icosahedronGeometry args={[1, 0]} />
+        ) : zoomLevel === 'sector' ? (
+          <octahedronGeometry args={[1, 0]} />
+        ) : (
+          <sphereGeometry args={[1, 16, 16]} />
+        )}
         <meshStandardMaterial
           vertexColors
           emissive="#ffffff"

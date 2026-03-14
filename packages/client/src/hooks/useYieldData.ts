@@ -8,6 +8,7 @@ export interface YieldData {
   oneYearAgo: Record<string, number>
   twoYearsAgo: Record<string, number>
   fedFunds: number
+  dollarIndex: number | null
 }
 
 async function fetchYields(): Promise<YieldData> {

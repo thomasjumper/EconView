@@ -65,8 +65,16 @@ export function useAIQuery() {
         break
       }
 
+      case 'compare': {
+        if (response.highlights && response.highlights.length >= 2) {
+          store.setCompareNodes(response.highlights)
+          // Also highlight the first node
+          store.setFocusNodeId(response.highlights[0])
+        }
+        break
+      }
+
       case 'filter':
-      case 'compare':
       case 'info':
       case 'none':
         // These actions just show the narration

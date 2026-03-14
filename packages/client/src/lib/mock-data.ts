@@ -133,4 +133,5 @@ export const MOCK_YIELDS = {
   oneYearAgo: { '2Y': 4.72, '5Y': 4.25, '10Y': 4.32, '30Y': 4.50 },
   twoYearsAgo: { '2Y': 5.05, '5Y': 4.50, '10Y': 4.68, '30Y': 4.85 },
   fedFunds: 4.33,
+  dollarIndex: 112.45,
 }

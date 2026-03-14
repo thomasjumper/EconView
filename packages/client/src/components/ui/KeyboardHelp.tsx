@@ -7,6 +7,7 @@ const SHORTCUTS = [
   { key: 'R', description: 'Risk dashboard' },
   { key: 'P', description: 'Performance dashboard' },
   { key: '/', description: 'Search' },
+  { key: 'V', description: 'Toggle voice narration' },
   { key: '`', description: 'Debug panel' },
   { key: '?', description: 'This help' },
 ]
@@ -14,20 +15,27 @@ const SHORTCUTS = [
 export function KeyboardHelp() {
   const isOpen = useAppStore((s) => s.showKeyboardHelp)
   const toggle = useAppStore((s) => s.toggleKeyboardHelp)
+  const toggleVoice = useAppStore((s) => s.toggleVoice)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
+
       if (e.key === '?') {
-        const target = e.target as HTMLElement
-        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
         e.preventDefault()
         toggle()
+      }
+
+      if (e.key === 'v' || e.key === 'V') {
+        e.preventDefault()
+        toggleVoice()
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [toggle])
+  }, [toggle, toggleVoice])
 
   if (!isOpen) return null
 
