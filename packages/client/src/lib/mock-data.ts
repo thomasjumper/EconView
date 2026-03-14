@@ -1,8 +1,8 @@
-import type { EconNode, EconEdge, WorldRegion } from '@econview/shared'
+import type { EconNode, EconEdge } from '@econview/shared'
 
 // ── Country → Region mapping ────────────────────────────────────────────────────
 
-export const COUNTRY_REGIONS: Record<string, WorldRegion> = {
+export const COUNTRY_REGIONS: Record<string, string> = {
   USA: 'north_america', CAN: 'north_america', MEX: 'north_america',
   BRA: 'latin_america', ARG: 'latin_america', CHL: 'latin_america', COL: 'latin_america', PER: 'latin_america',
   GBR: 'western_europe', DEU: 'western_europe', FRA: 'western_europe', ITA: 'western_europe', ESP: 'western_europe',

@@ -1,4 +1,4 @@
-import type { EconNode, EconEdge, ExchangeDef, WorldRegion } from '@econview/shared'
+import type { EconNode, EconEdge, ExchangeDef } from '@econview/shared'
 import { GICS_SECTORS } from '@econview/shared'
 
 // ── Market Definitions ─────────────────────────────────────────────────────
@@ -14,72 +14,72 @@ export interface MarketDef {
 
 export const GLOBAL_EXCHANGES: ExchangeDef[] = [
   // North America
-  { id: 'NYSE', label: 'New York Stock Exchange', country: 'United States', countryCode: 'USA', region: 'north_america', type: 'equity', marketCap: 28.4e12, currency: 'USD', timezone: 'America/New_York', indexTicker: '^NYA', indexName: 'NYSE Composite' },
-  { id: 'NASDAQ', label: 'NASDAQ', country: 'United States', countryCode: 'USA', region: 'north_america', type: 'equity', marketCap: 25.5e12, currency: 'USD', timezone: 'America/New_York', indexTicker: '^IXIC', indexName: 'NASDAQ Composite' },
-  { id: 'TSX', label: 'Toronto Stock Exchange', country: 'Canada', countryCode: 'CAN', region: 'north_america', type: 'equity', marketCap: 3.2e12, currency: 'CAD', timezone: 'America/Toronto', indexTicker: '^GSPTSE', indexName: 'S&P/TSX Composite' },
-  { id: 'BMV', label: 'Bolsa Mexicana de Valores', country: 'Mexico', countryCode: 'MEX', region: 'north_america', type: 'equity', marketCap: 0.55e12, currency: 'MXN', timezone: 'America/Mexico_City', indexTicker: '^MXX', indexName: 'IPC' },
+  { id: 'NYSE', name: 'New York Stock Exchange', countryCode: 'USA', region: 'north_america', marketCap: 28.4e12, currency: 'USD', timezone: 'America/New_York' },
+  { id: 'NASDAQ', name: 'NASDAQ', countryCode: 'USA', region: 'north_america', marketCap: 25.5e12, currency: 'USD', timezone: 'America/New_York' },
+  { id: 'TSX', name: 'Toronto Stock Exchange', countryCode: 'CAN', region: 'north_america', marketCap: 3.2e12, currency: 'CAD', timezone: 'America/Toronto' },
+  { id: 'BMV', name: 'Bolsa Mexicana de Valores', countryCode: 'MEX', region: 'north_america', marketCap: 0.55e12, currency: 'MXN', timezone: 'America/Mexico_City' },
 
   // Western Europe
-  { id: 'LSE', label: 'London Stock Exchange', country: 'United Kingdom', countryCode: 'GBR', region: 'western_europe', type: 'equity', marketCap: 3.4e12, currency: 'GBP', timezone: 'Europe/London', indexTicker: '^FTSE', indexName: 'FTSE 100' },
-  { id: 'EURONEXT', label: 'Euronext', country: 'Netherlands', countryCode: 'NLD', region: 'western_europe', type: 'equity', marketCap: 7.3e12, currency: 'EUR', timezone: 'Europe/Amsterdam', indexTicker: '^N100', indexName: 'Euronext 100' },
-  { id: 'XETRA', label: 'Deutsche B\u00f6rse (Xetra)', country: 'Germany', countryCode: 'DEU', region: 'western_europe', type: 'equity', marketCap: 2.3e12, currency: 'EUR', timezone: 'Europe/Berlin', indexTicker: '^GDAXI', indexName: 'DAX 40' },
-  { id: 'SIX', label: 'SIX Swiss Exchange', country: 'Switzerland', countryCode: 'CHE', region: 'western_europe', type: 'equity', marketCap: 1.9e12, currency: 'CHF', timezone: 'Europe/Zurich', indexTicker: '^SSMI', indexName: 'SMI' },
-  { id: 'BORSA', label: 'Borsa Italiana', country: 'Italy', countryCode: 'ITA', region: 'western_europe', type: 'equity', marketCap: 0.8e12, currency: 'EUR', timezone: 'Europe/Rome', indexTicker: 'FTSEMIB.MI', indexName: 'FTSE MIB' },
-  { id: 'BME', label: 'Bolsas y Mercados Espa\u00f1oles', country: 'Spain', countryCode: 'ESP', region: 'western_europe', type: 'equity', marketCap: 0.65e12, currency: 'EUR', timezone: 'Europe/Madrid', indexTicker: '^IBEX', indexName: 'IBEX 35' },
-  { id: 'OMX', label: 'Nasdaq Nordic (OMX)', country: 'Sweden', countryCode: 'SWE', region: 'western_europe', type: 'equity', marketCap: 1.8e12, currency: 'SEK', timezone: 'Europe/Stockholm', indexTicker: '^OMX', indexName: 'OMX Stockholm 30' },
+  { id: 'LSE', name: 'London Stock Exchange', countryCode: 'GBR', region: 'western_europe', marketCap: 3.4e12, currency: 'GBP', timezone: 'Europe/London' },
+  { id: 'EURONEXT', name: 'Euronext', countryCode: 'NLD', region: 'western_europe', marketCap: 7.3e12, currency: 'EUR', timezone: 'Europe/Amsterdam' },
+  { id: 'XETRA', name: 'Deutsche B\u00f6rse (Xetra)', countryCode: 'DEU', region: 'western_europe', marketCap: 2.3e12, currency: 'EUR', timezone: 'Europe/Berlin' },
+  { id: 'SIX', name: 'SIX Swiss Exchange', countryCode: 'CHE', region: 'western_europe', marketCap: 1.9e12, currency: 'CHF', timezone: 'Europe/Zurich' },
+  { id: 'BORSA', name: 'Borsa Italiana', countryCode: 'ITA', region: 'western_europe', marketCap: 0.8e12, currency: 'EUR', timezone: 'Europe/Rome' },
+  { id: 'BME', name: 'Bolsas y Mercados Espa\u00f1oles', countryCode: 'ESP', region: 'western_europe', marketCap: 0.65e12, currency: 'EUR', timezone: 'Europe/Madrid' },
+  { id: 'OMX', name: 'Nasdaq Nordic (OMX)', countryCode: 'SWE', region: 'western_europe', marketCap: 1.8e12, currency: 'SEK', timezone: 'Europe/Stockholm' },
 
   // East Asia
-  { id: 'TSE', label: 'Tokyo Stock Exchange', country: 'Japan', countryCode: 'JPN', region: 'east_asia', type: 'equity', marketCap: 6.5e12, currency: 'JPY', timezone: 'Asia/Tokyo', indexTicker: '^N225', indexName: 'Nikkei 225' },
-  { id: 'SSE', label: 'Shanghai Stock Exchange', country: 'China', countryCode: 'CHN', region: 'east_asia', type: 'equity', marketCap: 7.4e12, currency: 'CNY', timezone: 'Asia/Shanghai', indexTicker: '000001.SS', indexName: 'SSE Composite' },
-  { id: 'SZSE', label: 'Shenzhen Stock Exchange', country: 'China', countryCode: 'CHN', region: 'east_asia', type: 'equity', marketCap: 4.8e12, currency: 'CNY', timezone: 'Asia/Shanghai', indexTicker: '399001.SZ', indexName: 'SZSE Component' },
-  { id: 'HKEX', label: 'Hong Kong Stock Exchange', country: 'Hong Kong', countryCode: 'HKG', region: 'east_asia', type: 'equity', marketCap: 4.1e12, currency: 'HKD', timezone: 'Asia/Hong_Kong', indexTicker: '^HSI', indexName: 'Hang Seng' },
-  { id: 'KRX', label: 'Korea Exchange', country: 'South Korea', countryCode: 'KOR', region: 'east_asia', type: 'equity', marketCap: 1.8e12, currency: 'KRW', timezone: 'Asia/Seoul', indexTicker: '^KS11', indexName: 'KOSPI' },
-  { id: 'TWSE', label: 'Taiwan Stock Exchange', country: 'Taiwan', countryCode: 'TWN', region: 'east_asia', type: 'equity', marketCap: 2.1e12, currency: 'TWD', timezone: 'Asia/Taipei', indexTicker: '^TWII', indexName: 'TAIEX' },
+  { id: 'TSE', name: 'Tokyo Stock Exchange', countryCode: 'JPN', region: 'east_asia', marketCap: 6.5e12, currency: 'JPY', timezone: 'Asia/Tokyo' },
+  { id: 'SSE', name: 'Shanghai Stock Exchange', countryCode: 'CHN', region: 'east_asia', marketCap: 7.4e12, currency: 'CNY', timezone: 'Asia/Shanghai' },
+  { id: 'SZSE', name: 'Shenzhen Stock Exchange', countryCode: 'CHN', region: 'east_asia', marketCap: 4.8e12, currency: 'CNY', timezone: 'Asia/Shanghai' },
+  { id: 'HKEX', name: 'Hong Kong Stock Exchange', countryCode: 'HKG', region: 'east_asia', marketCap: 4.1e12, currency: 'HKD', timezone: 'Asia/Hong_Kong' },
+  { id: 'KRX', name: 'Korea Exchange', countryCode: 'KOR', region: 'east_asia', marketCap: 1.8e12, currency: 'KRW', timezone: 'Asia/Seoul' },
+  { id: 'TWSE', name: 'Taiwan Stock Exchange', countryCode: 'TWN', region: 'east_asia', marketCap: 2.1e12, currency: 'TWD', timezone: 'Asia/Taipei' },
 
   // South & Southeast Asia
-  { id: 'BSE', label: 'Bombay Stock Exchange', country: 'India', countryCode: 'IND', region: 'south_asia', type: 'equity', marketCap: 4.9e12, currency: 'INR', timezone: 'Asia/Kolkata', indexTicker: '^BSESN', indexName: 'SENSEX' },
-  { id: 'NSE', label: 'National Stock Exchange India', country: 'India', countryCode: 'IND', region: 'south_asia', type: 'equity', marketCap: 4.6e12, currency: 'INR', timezone: 'Asia/Kolkata', indexTicker: '^NSEI', indexName: 'NIFTY 50' },
-  { id: 'SGX', label: 'Singapore Exchange', country: 'Singapore', countryCode: 'SGP', region: 'southeast_asia', type: 'equity', marketCap: 0.65e12, currency: 'SGD', timezone: 'Asia/Singapore', indexTicker: '^STI', indexName: 'Straits Times' },
-  { id: 'SET', label: 'Stock Exchange of Thailand', country: 'Thailand', countryCode: 'THA', region: 'southeast_asia', type: 'equity', marketCap: 0.5e12, currency: 'THB', timezone: 'Asia/Bangkok', indexTicker: '^SET.BK', indexName: 'SET Index' },
-  { id: 'IDX', label: 'Indonesia Stock Exchange', country: 'Indonesia', countryCode: 'IDN', region: 'southeast_asia', type: 'equity', marketCap: 0.58e12, currency: 'IDR', timezone: 'Asia/Jakarta', indexTicker: '^JKSE', indexName: 'Jakarta Composite' },
-  { id: 'BURSA', label: 'Bursa Malaysia', country: 'Malaysia', countryCode: 'MYS', region: 'southeast_asia', type: 'equity', marketCap: 0.38e12, currency: 'MYR', timezone: 'Asia/Kuala_Lumpur', indexTicker: '^KLSE', indexName: 'FTSE KLCI' },
-  { id: 'PSE', label: 'Philippine Stock Exchange', country: 'Philippines', countryCode: 'PHL', region: 'southeast_asia', type: 'equity', marketCap: 0.25e12, currency: 'PHP', timezone: 'Asia/Manila', indexTicker: 'PSEI.PS', indexName: 'PSEi' },
+  { id: 'BSE', name: 'Bombay Stock Exchange', countryCode: 'IND', region: 'south_asia', marketCap: 4.9e12, currency: 'INR', timezone: 'Asia/Kolkata' },
+  { id: 'NSE', name: 'National Stock Exchange India', countryCode: 'IND', region: 'south_asia', marketCap: 4.6e12, currency: 'INR', timezone: 'Asia/Kolkata' },
+  { id: 'SGX', name: 'Singapore Exchange', countryCode: 'SGP', region: 'southeast_asia', marketCap: 0.65e12, currency: 'SGD', timezone: 'Asia/Singapore' },
+  { id: 'SET', name: 'Stock Exchange of Thailand', countryCode: 'THA', region: 'southeast_asia', marketCap: 0.5e12, currency: 'THB', timezone: 'Asia/Bangkok' },
+  { id: 'IDX', name: 'Indonesia Stock Exchange', countryCode: 'IDN', region: 'southeast_asia', marketCap: 0.58e12, currency: 'IDR', timezone: 'Asia/Jakarta' },
+  { id: 'BURSA', name: 'Bursa Malaysia', countryCode: 'MYS', region: 'southeast_asia', marketCap: 0.38e12, currency: 'MYR', timezone: 'Asia/Kuala_Lumpur' },
+  { id: 'PSE', name: 'Philippine Stock Exchange', countryCode: 'PHL', region: 'southeast_asia', marketCap: 0.25e12, currency: 'PHP', timezone: 'Asia/Manila' },
 
   // Oceania
-  { id: 'ASX', label: 'Australian Securities Exchange', country: 'Australia', countryCode: 'AUS', region: 'oceania', type: 'equity', marketCap: 1.7e12, currency: 'AUD', timezone: 'Australia/Sydney', indexTicker: '^AXJO', indexName: 'ASX 200' },
-  { id: 'NZX', label: 'New Zealand Exchange', country: 'New Zealand', countryCode: 'NZL', region: 'oceania', type: 'equity', marketCap: 0.1e12, currency: 'NZD', timezone: 'Pacific/Auckland', indexTicker: '^NZ50', indexName: 'NZX 50' },
+  { id: 'ASX', name: 'Australian Securities Exchange', countryCode: 'AUS', region: 'oceania', marketCap: 1.7e12, currency: 'AUD', timezone: 'Australia/Sydney' },
+  { id: 'NZX', name: 'New Zealand Exchange', countryCode: 'NZL', region: 'oceania', marketCap: 0.1e12, currency: 'NZD', timezone: 'Pacific/Auckland' },
 
   // Middle East
-  { id: 'TADAWUL', label: 'Saudi Exchange (Tadawul)', country: 'Saudi Arabia', countryCode: 'SAU', region: 'middle_east', type: 'equity', marketCap: 2.8e12, currency: 'SAR', timezone: 'Asia/Riyadh', indexTicker: '^TASI', indexName: 'TASI' },
-  { id: 'ADX', label: 'Abu Dhabi Securities Exchange', country: 'UAE', countryCode: 'ARE', region: 'middle_east', type: 'equity', marketCap: 0.75e12, currency: 'AED', timezone: 'Asia/Dubai', indexTicker: '^ADI', indexName: 'FTSE ADX' },
-  { id: 'TASE', label: 'Tel Aviv Stock Exchange', country: 'Israel', countryCode: 'ISR', region: 'middle_east', type: 'equity', marketCap: 0.3e12, currency: 'ILS', timezone: 'Asia/Jerusalem', indexTicker: '^TA125.TA', indexName: 'TA-125' },
-  { id: 'QSE', label: 'Qatar Stock Exchange', country: 'Qatar', countryCode: 'QAT', region: 'middle_east', type: 'equity', marketCap: 0.17e12, currency: 'QAR', timezone: 'Asia/Qatar', indexTicker: 'QSI.QA', indexName: 'QE Index' },
+  { id: 'TADAWUL', name: 'Saudi Exchange (Tadawul)', countryCode: 'SAU', region: 'middle_east', marketCap: 2.8e12, currency: 'SAR', timezone: 'Asia/Riyadh' },
+  { id: 'ADX', name: 'Abu Dhabi Securities Exchange', countryCode: 'ARE', region: 'middle_east', marketCap: 0.75e12, currency: 'AED', timezone: 'Asia/Dubai' },
+  { id: 'TASE', name: 'Tel Aviv Stock Exchange', countryCode: 'ISR', region: 'middle_east', marketCap: 0.3e12, currency: 'ILS', timezone: 'Asia/Jerusalem' },
+  { id: 'QSE', name: 'Qatar Stock Exchange', countryCode: 'QAT', region: 'middle_east', marketCap: 0.17e12, currency: 'QAR', timezone: 'Asia/Qatar' },
 
   // Latin America
-  { id: 'B3', label: 'B3 (Brasil Bolsa Balc\u00e3o)', country: 'Brazil', countryCode: 'BRA', region: 'latin_america', type: 'equity', marketCap: 0.95e12, currency: 'BRL', timezone: 'America/Sao_Paulo', indexTicker: '^BVSP', indexName: 'Ibovespa' },
-  { id: 'BCS', label: 'Bolsa de Santiago', country: 'Chile', countryCode: 'CHL', region: 'latin_america', type: 'equity', marketCap: 0.2e12, currency: 'CLP', timezone: 'America/Santiago', indexTicker: '^IPSA', indexName: 'IPSA' },
-  { id: 'BVC', label: 'Bolsa de Valores de Colombia', country: 'Colombia', countryCode: 'COL', region: 'latin_america', type: 'equity', marketCap: 0.12e12, currency: 'COP', timezone: 'America/Bogota', indexTicker: 'COLCAP.BG', indexName: 'COLCAP' },
-  { id: 'BVL', label: 'Bolsa de Valores de Lima', country: 'Peru', countryCode: 'PER', region: 'latin_america', type: 'equity', marketCap: 0.09e12, currency: 'PEN', timezone: 'America/Lima' },
-  { id: 'BCBA', label: 'Bolsa de Buenos Aires', country: 'Argentina', countryCode: 'ARG', region: 'latin_america', type: 'equity', marketCap: 0.06e12, currency: 'ARS', timezone: 'America/Argentina/Buenos_Aires', indexTicker: '^MERV', indexName: 'MERVAL' },
+  { id: 'B3', name: 'B3 (Brasil Bolsa Balc\u00e3o)', countryCode: 'BRA', region: 'latin_america', marketCap: 0.95e12, currency: 'BRL', timezone: 'America/Sao_Paulo' },
+  { id: 'BCS', name: 'Bolsa de Santiago', countryCode: 'CHL', region: 'latin_america', marketCap: 0.2e12, currency: 'CLP', timezone: 'America/Santiago' },
+  { id: 'BVC', name: 'Bolsa de Valores de Colombia', countryCode: 'COL', region: 'latin_america', marketCap: 0.12e12, currency: 'COP', timezone: 'America/Bogota' },
+  { id: 'BVL', name: 'Bolsa de Valores de Lima', countryCode: 'PER', region: 'latin_america', marketCap: 0.09e12, currency: 'PEN', timezone: 'America/Lima' },
+  { id: 'BCBA', name: 'Bolsa de Buenos Aires', countryCode: 'ARG', region: 'latin_america', marketCap: 0.06e12, currency: 'ARS', timezone: 'America/Argentina/Buenos_Aires' },
 
   // Africa
-  { id: 'JSE', label: 'Johannesburg Stock Exchange', country: 'South Africa', countryCode: 'ZAF', region: 'africa', type: 'equity', marketCap: 1.1e12, currency: 'ZAR', timezone: 'Africa/Johannesburg', indexTicker: '^J200', indexName: 'JSE Top 40' },
-  { id: 'NGX', label: 'Nigerian Exchange', country: 'Nigeria', countryCode: 'NGA', region: 'africa', type: 'equity', marketCap: 0.06e12, currency: 'NGN', timezone: 'Africa/Lagos', indexTicker: 'NGXASI', indexName: 'NGX ASI' },
-  { id: 'EGX', label: 'Egyptian Exchange', country: 'Egypt', countryCode: 'EGY', region: 'africa', type: 'equity', marketCap: 0.04e12, currency: 'EGP', timezone: 'Africa/Cairo', indexTicker: '^EGX30', indexName: 'EGX 30' },
+  { id: 'JSE', name: 'Johannesburg Stock Exchange', countryCode: 'ZAF', region: 'africa', marketCap: 1.1e12, currency: 'ZAR', timezone: 'Africa/Johannesburg' },
+  { id: 'NGX', name: 'Nigerian Exchange', countryCode: 'NGA', region: 'africa', marketCap: 0.06e12, currency: 'NGN', timezone: 'Africa/Lagos' },
+  { id: 'EGX', name: 'Egyptian Exchange', countryCode: 'EGY', region: 'africa', marketCap: 0.04e12, currency: 'EGP', timezone: 'Africa/Cairo' },
 
   // Eastern Europe
-  { id: 'MOEX', label: 'Moscow Exchange', country: 'Russia', countryCode: 'RUS', region: 'eastern_europe', type: 'equity', marketCap: 0.65e12, currency: 'RUB', timezone: 'Europe/Moscow', indexTicker: 'IMOEX.ME', indexName: 'MOEX Russia' },
-  { id: 'GPW', label: 'Warsaw Stock Exchange', country: 'Poland', countryCode: 'POL', region: 'eastern_europe', type: 'equity', marketCap: 0.22e12, currency: 'PLN', timezone: 'Europe/Warsaw', indexTicker: '^WIG20', indexName: 'WIG 20' },
-  { id: 'BIST', label: 'Borsa Istanbul', country: 'Turkey', countryCode: 'TUR', region: 'eastern_europe', type: 'equity', marketCap: 0.25e12, currency: 'TRY', timezone: 'Europe/Istanbul', indexTicker: 'XU100.IS', indexName: 'BIST 100' },
-  { id: 'PSE_CZ', label: 'Prague Stock Exchange', country: 'Czechia', countryCode: 'CZE', region: 'eastern_europe', type: 'equity', marketCap: 0.03e12, currency: 'CZK', timezone: 'Europe/Prague', indexTicker: '^PX', indexName: 'PX Index' },
-  { id: 'KASE', label: 'Kazakhstan Stock Exchange', country: 'Kazakhstan', countryCode: 'KAZ', region: 'eastern_europe', type: 'equity', marketCap: 0.05e12, currency: 'KZT', timezone: 'Asia/Almaty', indexTicker: 'KASE', indexName: 'KASE Index' },
+  { id: 'MOEX', name: 'Moscow Exchange', countryCode: 'RUS', region: 'eastern_europe', marketCap: 0.65e12, currency: 'RUB', timezone: 'Europe/Moscow' },
+  { id: 'GPW', name: 'Warsaw Stock Exchange', countryCode: 'POL', region: 'eastern_europe', marketCap: 0.22e12, currency: 'PLN', timezone: 'Europe/Warsaw' },
+  { id: 'BIST', name: 'Borsa Istanbul', countryCode: 'TUR', region: 'eastern_europe', marketCap: 0.25e12, currency: 'TRY', timezone: 'Europe/Istanbul' },
+  { id: 'PSE_CZ', name: 'Prague Stock Exchange', countryCode: 'CZE', region: 'eastern_europe', marketCap: 0.03e12, currency: 'CZK', timezone: 'Europe/Prague' },
+  { id: 'KASE', name: 'Kazakhstan Stock Exchange', countryCode: 'KAZ', region: 'eastern_europe', marketCap: 0.05e12, currency: 'KZT', timezone: 'Asia/Almaty' },
 
   // Special / Global
-  { id: 'BOND_US', label: 'US Bond Market', country: 'United States', countryCode: 'USA', region: 'north_america', type: 'bond', marketCap: 51.3e12, currency: 'USD', timezone: 'America/New_York' },
-  { id: 'CME', label: 'CME Group', country: 'United States', countryCode: 'USA', region: 'north_america', type: 'derivatives', marketCap: 5.8e12, currency: 'USD', timezone: 'America/Chicago' },
-  { id: 'LME', label: 'London Metal Exchange', country: 'United Kingdom', countryCode: 'GBR', region: 'western_europe', type: 'commodity', marketCap: 0, currency: 'USD', timezone: 'Europe/London' },
-  { id: 'ICE', label: 'Intercontinental Exchange', country: 'United States', countryCode: 'USA', region: 'north_america', type: 'derivatives', marketCap: 0, currency: 'USD', timezone: 'America/New_York' },
-  { id: 'CRYPTO', label: 'Crypto Markets', country: 'Global', countryCode: 'GLOBAL', region: 'north_america', type: 'crypto', marketCap: 2.8e12, currency: 'USD', timezone: 'UTC' },
+  { id: 'BOND_US', name: 'US Bond Market', countryCode: 'USA', region: 'north_america', marketCap: 51.3e12, currency: 'USD', timezone: 'America/New_York' },
+  { id: 'CME', name: 'CME Group', countryCode: 'USA', region: 'north_america', marketCap: 5.8e12, currency: 'USD', timezone: 'America/Chicago' },
+  { id: 'LME', name: 'London Metal Exchange', countryCode: 'GBR', region: 'western_europe', marketCap: 0, currency: 'USD', timezone: 'Europe/London' },
+  { id: 'ICE', name: 'Intercontinental Exchange', countryCode: 'USA', region: 'north_america', marketCap: 0, currency: 'USD', timezone: 'America/New_York' },
+  { id: 'CRYPTO', name: 'Crypto Markets', countryCode: 'GLOBAL', region: 'north_america', marketCap: 2.8e12, currency: 'USD', timezone: 'UTC' },
 ]
 
 // Legacy US Markets accessor (backward compat)
@@ -94,7 +94,7 @@ export const US_MARKETS: MarketDef[] = [
 // ── Helper: get exchanges for a country ───────────────────────────────────────
 
 export function getExchangesForCountry(countryCode: string): ExchangeDef[] {
-  return GLOBAL_EXCHANGES.filter(e => e.countryCode === countryCode && e.type === 'equity')
+  return GLOBAL_EXCHANGES.filter(e => e.countryCode === countryCode)
 }
 
 // ── GICS Sectors ─────────────────────────────────────────────────────────
@@ -286,7 +286,7 @@ export function getMarketsForCountry(countryId: string): EconNode[] {
   return exchanges.map((ex) => ({
     id: ex.id,
     type: 'market' as const,
-    label: ex.label,
+    label: ex.name,
     exchangeCode: ex.id,
     marketCap: ex.marketCap,
     parent: countryId,
@@ -358,7 +358,7 @@ export function getZoomPathLabels(zoomPath: string[], countryNodes: EconNode[]):
     }
     if (i === 1) {
       const exchange = GLOBAL_EXCHANGES.find((e) => e.id === id)
-      if (exchange) return exchange.label
+      if (exchange) return exchange.name
       const market = US_MARKETS.find((m) => m.id === id)
       return market?.label ?? id
     }

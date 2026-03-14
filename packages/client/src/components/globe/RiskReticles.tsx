@@ -25,10 +25,7 @@ export function RiskReticles({ nodes }: RiskReticlesProps) {
   const visualMode = useAppStore((s) => s.visualMode)
 
   useEffect(() => {
-    const styleEl = document.createElement('style')
-    styleEl.textContent = reticleStyle
-    document.head.appendChild(styleEl)
-    return () => { document.head.removeChild(styleEl) }
+    injectReticleStyle()
   }, [])
 
   // Top 5 highest-risk nodes (lowest/most negative gdpGrowth)
