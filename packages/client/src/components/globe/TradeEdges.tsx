@@ -10,9 +10,10 @@ interface TradeEdgesProps {
   nodes: LayoutNode[]
   edges: EconEdge[]
   visible: boolean
+  globeMode?: boolean
 }
 
-export function TradeEdges({ nodes, edges, visible }: TradeEdgesProps) {
+export function TradeEdges({ nodes, edges, visible, globeMode = false }: TradeEdgesProps) {
   const modeOverrides = useVisualMode()
   const arcOpacityMultiplier = useAppStore((s) => s.debug.arcOpacityMultiplier)
 
@@ -33,8 +34,19 @@ export function TradeEdges({ nodes, edges, visible }: TradeEdgesProps) {
         const start = new THREE.Vector3(src.x, src.y, src.z)
         const end = new THREE.Vector3(tgt.x, tgt.y, tgt.z)
         const mid = start.clone().add(end).multiplyScalar(0.5)
-        const lift = start.distanceTo(end) * 0.15
-        mid.y += lift
+
+        if (globeMode) {
+          // Great-circle style arc: push midpoint outward from sphere center
+          // so the arc curves above the globe surface (radius 4)
+          const midLen = mid.length()
+          if (midLen > 0.001) {
+            const arcHeight = 6.5 + start.distanceTo(end) * 0.15
+            mid.normalize().multiplyScalar(arcHeight)
+          }
+        } else {
+          const lift = start.distanceTo(end) * 0.15
+          mid.y += lift
+        }
 
         const curve = new THREE.QuadraticBezierCurve3(start, mid, end)
         const points = curve.getPoints(20)
@@ -48,7 +60,7 @@ export function TradeEdges({ nodes, edges, visible }: TradeEdgesProps) {
         }
       })
       .filter(Boolean) as { points: [number, number, number][]; opacity: number; id: string }[]
-  }, [edges, nodeMap, nodes, visible, modeOverrides.edgeOpacityMultiplier, arcOpacityMultiplier])
+  }, [edges, nodeMap, nodes, visible, globeMode, modeOverrides.edgeOpacityMultiplier, arcOpacityMultiplier])
 
   if (!visible) return null
 

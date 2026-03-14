@@ -7,6 +7,7 @@ import {
   forceLink,
 } from 'd3-force-3d'
 import type { EconNode, EconEdge } from '@econview/shared'
+import { useAppStore } from '../store/useAppStore'
 
 export interface LayoutNode extends EconNode {
   x: number
@@ -23,6 +24,8 @@ export function useForceLayout(
 ) {
   const [layoutNodes, setLayoutNodes] = useState<LayoutNode[]>([])
   const simRef = useRef<ReturnType<typeof forceSimulation> | null>(null)
+  const debug = useAppStore((s) => s.debug)
+  const { forceChargeStrength, forceLinkDistance, nodeScaleMultiplier } = debug
 
   useEffect(() => {
     if (nodes.length === 0) return
@@ -34,7 +37,7 @@ export function useForceLayout(
       const logSize = Math.log10(gdp) / Math.log10(maxGdp)
       return {
         ...n,
-        size: 0.3 + logSize * 1.5,
+        size: (0.3 + logSize * 1.5) * nodeScaleMultiplier,
         x: (Math.random() - 0.5) * 50,
         y: (Math.random() - 0.5) * 50,
         z: (Math.random() - 0.5) * 50,
@@ -52,13 +55,13 @@ export function useForceLayout(
       }))
 
     const sim = forceSimulation(simNodes, 3)
-      .force('charge', forceManyBody().strength(-120))
+      .force('charge', forceManyBody().strength(forceChargeStrength))
       .force('center', forceCenter())
       .force(
         'link',
         forceLink(simLinks)
           .id((d: any) => d.id)
-          .distance(8)
+          .distance(forceLinkDistance)
           .strength((l: any) => l.value * 0.3),
       )
       .force(
@@ -86,7 +89,7 @@ export function useForceLayout(
     return () => {
       sim.stop()
     }
-  }, [nodes, edges])
+  }, [nodes, edges, forceChargeStrength, forceLinkDistance, nodeScaleMultiplier])
 
   return layoutNodes
 }

@@ -104,7 +104,7 @@ const globeFragmentShader = `
     float terminatorGlow = exp(-pow((sunDot + 0.05) * 8.0, 2.0)) * 0.15;
     finalColor += vec3(0.1, 0.15, 0.3) * terminatorGlow;
 
-    gl_FragColor = vec4(finalColor, 0.6);
+    gl_FragColor = vec4(finalColor, 0.35);
   }
 `
 
@@ -163,8 +163,8 @@ export function EarthGlobe({ visible }: EarthGlobeProps) {
           const la2 = lat1 + (lat2 - lat1) * t2
           const lo2 = lon1 + (lon2 - lon1) * t2
 
-          const p1 = latLonToSphere(la1, lo1, 12.02)
-          const p2 = latLonToSphere(la2, lo2, 12.02)
+          const p1 = latLonToSphere(la1, lo1, 4.02)
+          const p2 = latLonToSphere(la2, lo2, 4.02)
 
           positions.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z)
         }
@@ -205,7 +205,7 @@ export function EarthGlobe({ visible }: EarthGlobeProps) {
     <group>
       {/* Main globe sphere */}
       <mesh ref={globeRef}>
-        <sphereGeometry args={[12, 64, 64]} />
+        <sphereGeometry args={[4, 48, 48]} />
         <shaderMaterial
           vertexShader={globeVertexShader}
           fragmentShader={globeFragmentShader}
@@ -228,7 +228,7 @@ export function EarthGlobe({ visible }: EarthGlobeProps) {
 
       {/* Atmosphere glow */}
       <mesh>
-        <sphereGeometry args={[12.8, 64, 64]} />
+        <sphereGeometry args={[4.5, 48, 48]} />
         <shaderMaterial
           vertexShader={atmosphereVertexShader}
           fragmentShader={atmosphereFragmentShader}

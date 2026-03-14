@@ -32,6 +32,8 @@ interface AppState {
   debugVisible: boolean
   debug: DebugSettings
   showCrisisPresets: boolean
+  showPerformanceDashboard: boolean
+  showKeyboardHelp: boolean
 
   setZoomLevel: (level: ZoomLevel) => void
   setFocusNodeId: (id: string | null) => void
@@ -42,6 +44,8 @@ interface AppState {
   toggleDebug: () => void
   setDebug: (partial: Partial<DebugSettings>) => void
   toggleCrisisPresets: () => void
+  togglePerformanceDashboard: () => void
+  toggleKeyboardHelp: () => void
   drillDown: (nodeId: string) => void
   zoomOut: () => void
 }
@@ -59,6 +63,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   debugVisible: false,
   debug: { ...DEFAULT_DEBUG },
   showCrisisPresets: false,
+  showPerformanceDashboard: false,
+  showKeyboardHelp: false,
 
   setZoomLevel: (level) => set({ zoomLevel: level }),
   setFocusNodeId: (id) => set({ focusNodeId: id }),
@@ -69,6 +75,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   toggleDebug: () => set((s) => ({ debugVisible: !s.debugVisible })),
   setDebug: (partial) => set((s) => ({ debug: { ...s.debug, ...partial } })),
   toggleCrisisPresets: () => set((s) => ({ showCrisisPresets: !s.showCrisisPresets })),
+  togglePerformanceDashboard: () => set((s) => ({ showPerformanceDashboard: !s.showPerformanceDashboard })),
+  toggleKeyboardHelp: () => set((s) => ({ showKeyboardHelp: !s.showKeyboardHelp })),
 
   drillDown: (nodeId) => {
     const { zoomLevel, zoomPath } = get()

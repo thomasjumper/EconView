@@ -6,7 +6,7 @@ import { useAppStore } from '../store/useAppStore'
 
 // Camera distance presets for each zoom level
 const ZOOM_DISTANCES: Record<ZoomLevel, number> = {
-  global: 45,
+  global: 15,
   market: 30,
   sector: 25,
   entity: 18,

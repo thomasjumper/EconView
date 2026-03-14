@@ -6,13 +6,17 @@ import { EffectComposer, Bloom, FXAA } from '@react-three/postprocessing'
 import { Starfield } from './Starfield'
 import { EarthGlobe } from './EarthGlobe'
 import { DrillDownNodes } from './DrillDownNodes'
+import { NetworkGraph } from './NetworkGraph'
 import { TradeEdges } from './TradeEdges'
 import { FlowParticles } from './FlowParticles'
 import { ShaderModes } from './ShaderModes'
 import { useForceLayout, type LayoutNode } from '../../hooks/useForceLayout'
+import { useGlobeLayout } from '../../hooks/useGlobeLayout'
 import { useVisualMode } from '../../hooks/useVisualMode'
 import { useAppStore } from '../../store/useAppStore'
 import { useGDPCountries } from '../../hooks/useGDPData'
+import { useTimelineData } from '../../hooks/useHistoricalData'
+import { useTimelineStore } from '../../store/useTimelineStore'
 import { useZoomTransition } from '../../hooks/useZoomTransition'
 import { getNodesForZoom, getEdgesForZoom } from '../../lib/market-data'
 import { MOCK_TRADE_EDGES } from '../../lib/mock-data'
@@ -27,13 +31,24 @@ function SceneContent() {
 
   const modeOverrides = useVisualMode()
 
+  const isReplayMode = useTimelineStore((s) => s.isReplayMode)
   const countryNodes = useGDPCountries()
+  const timelineData = useTimelineData()
 
   // Get nodes appropriate for current zoom level
-  const currentNodes = getNodesForZoom(zoomLevel, zoomPath, countryNodes)
-  const currentEdges = getEdgesForZoom(zoomLevel, MOCK_TRADE_EDGES)
+  // In replay mode, use timeline-driven data; otherwise use present-day data
+  const currentNodes = isReplayMode
+    ? timelineData.nodes
+    : getNodesForZoom(zoomLevel, zoomPath, countryNodes)
+  const currentEdges = isReplayMode
+    ? timelineData.edges
+    : getEdgesForZoom(zoomLevel, MOCK_TRADE_EDGES)
 
-  const layoutNodes = useForceLayout(currentNodes, currentEdges)
+  // At global zoom level, position nodes on the globe surface using geographic coordinates.
+  // At other zoom levels, use force-directed layout for floating node positioning.
+  const forceLayoutNodes = useForceLayout(currentNodes, currentEdges)
+  const globeLayoutNodes = useGlobeLayout(currentNodes)
+  const layoutNodes = zoomLevel === 'global' ? globeLayoutNodes : forceLayoutNodes
 
   // Track the last clicked node position for camera animation
   const [clickedPos, setClickedPos] = useState<{ x: number; y: number; z: number } | null>(null)
@@ -102,11 +117,15 @@ function SceneContent() {
       {/* Data nodes — DrillDownNodes handles all zoom levels */}
       <DrillDownNodes nodes={layoutNodes} onNodeClick={handleNodeClick} />
 
+      {/* Corporate relationship network (entity zoom only) */}
+      {zoomLevel === 'entity' && <NetworkGraph nodes={layoutNodes} />}
+
       {/* Trade edges */}
       <TradeEdges
         nodes={layoutNodes}
         edges={currentEdges}
         visible={edgesVisible}
+        globeMode={zoomLevel === 'global'}
       />
 
       {/* Flow particles along trade edges */}
@@ -135,7 +154,7 @@ function SceneContent() {
 export function EconScene() {
   return (
     <Canvas
-      camera={{ position: [0, 0, 45], fov: 60, near: 0.1, far: 500 }}
+      camera={{ position: [0, 0, 15], fov: 60, near: 0.1, far: 500 }}
       gl={{
         antialias: false,
         toneMapping: THREE.NoToneMapping,

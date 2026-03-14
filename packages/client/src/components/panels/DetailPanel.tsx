@@ -1,6 +1,7 @@
 import { useAppStore } from '../../store/useAppStore'
 import { MOCK_TRADE_EDGES } from '../../lib/mock-data'
 import { SECTORS, COMPANIES, US_MARKETS } from '../../lib/market-data'
+import { useCompanyData } from '../../hooks/useCompanyData'
 
 function formatGDP(gdp: number): string {
   if (gdp >= 1e12) return `$${(gdp / 1e12).toFixed(2)}T`
@@ -170,10 +171,18 @@ function EntityDetail() {
   const sector = SECTORS.find((s) => s.id === sectorId)
   const companies = COMPANIES[sectorId] ?? []
 
+  const { data: financials, isLoading: financialsLoading, isError: financialsError } =
+    useCompanyData(selectedNode?.ticker)
+
   if (selectedNode) {
+    const debtAssetsRatio =
+      financials?.totalDebt != null && financials?.totalAssets != null && financials.totalAssets > 0
+        ? financials.totalDebt / financials.totalAssets
+        : null
+
     // Show selected company detail
     return (
-      <div className="absolute top-14 left-4 w-72 bg-black/70 backdrop-blur-xl border border-white/5 rounded-lg p-4 pointer-events-auto">
+      <div className="absolute top-14 left-4 w-72 bg-black/70 backdrop-blur-xl border border-white/5 rounded-lg p-4 pointer-events-auto max-h-[80vh] overflow-y-auto">
         <div className="flex justify-between items-start mb-3">
           <div>
             <h2 className="text-white text-base font-medium">{selectedNode.label}</h2>
@@ -197,6 +206,68 @@ function EntityDetail() {
               {sector?.label ?? selectedNode.sectorCode}
             </span>
           </div>
+        </div>
+
+        {/* Company Financials */}
+        <div className="mt-4 pt-3 border-t border-white/5">
+          <h3 className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-2">
+            Financials
+          </h3>
+          {financialsLoading && (
+            <div className="flex items-center gap-2 py-2">
+              <div className="w-3 h-3 border border-econ-blue/50 border-t-econ-blue rounded-full animate-spin" />
+              <span className="text-[10px] text-slate-500">Loading financials...</span>
+            </div>
+          )}
+          {financialsError && !financialsLoading && (
+            <p className="text-[10px] text-slate-600 italic">Financials unavailable</p>
+          )}
+          {financials && !financialsLoading && (
+            <div className="space-y-1.5">
+              {financials.revenue != null && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Revenue</span>
+                  <span className="font-mono text-slate-300">{formatValue(financials.revenue)}</span>
+                </div>
+              )}
+              {financials.netIncome != null && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Net Income</span>
+                  <span className={`font-mono ${financials.netIncome >= 0 ? 'text-econ-green' : 'text-econ-red'}`}>
+                    {financials.netIncome < 0 ? '-' : ''}{formatValue(Math.abs(financials.netIncome))}
+                  </span>
+                </div>
+              )}
+              {financials.operatingIncome != null && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Operating Income</span>
+                  <span className={`font-mono ${financials.operatingIncome >= 0 ? 'text-econ-green' : 'text-econ-red'}`}>
+                    {financials.operatingIncome < 0 ? '-' : ''}{formatValue(Math.abs(financials.operatingIncome))}
+                  </span>
+                </div>
+              )}
+              {financials.totalAssets != null && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Total Assets</span>
+                  <span className="font-mono text-slate-300">{formatValue(financials.totalAssets)}</span>
+                </div>
+              )}
+              {financials.totalDebt != null && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Total Debt</span>
+                  <span className="font-mono text-slate-300">{formatValue(financials.totalDebt)}</span>
+                </div>
+              )}
+              {debtAssetsRatio != null && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Debt/Assets</span>
+                  <span className={`font-mono ${debtAssetsRatio > 0.5 ? 'text-econ-red' : 'text-slate-300'}`}>
+                    {(debtAssetsRatio * 100).toFixed(1)}%
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     )

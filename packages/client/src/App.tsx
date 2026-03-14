@@ -12,6 +12,8 @@ import { SearchBar } from './components/ui/SearchBar'
 import { NarrationPanel } from './components/panels/NarrationPanel'
 import { AlertIndicators } from './components/ui/AlertIndicators'
 import { RiskDashboard } from './components/panels/RiskDashboard'
+import { PerformanceDashboard } from './components/panels/PerformanceDashboard'
+import { KeyboardHelp } from './components/ui/KeyboardHelp'
 import { useReplayAnimation } from './hooks/useReplayAnimation'
 
 export default function App() {
@@ -43,10 +45,14 @@ export default function App() {
       <NarrationPanel text={narration} onDismiss={dismissNarration} />
       <SearchBar onNarration={handleNarration} />
       <RiskDashboard />
+      <PerformanceDashboard />
 
       {/* Phase 5: Timeline / Historical Replay */}
       <TimelineScrubber />
       <CrisisPresets />
+
+      {/* Overlays */}
+      <KeyboardHelp />
     </div>
   )
 }

@@ -237,35 +237,72 @@ export function DrillDownNodes({ nodes, onNodeClick }: DrillDownNodesProps) {
       </instancedMesh>
 
       {/* Tooltip for hovered node */}
-      {hoveredNode && (
-        <Html
-          position={[hoveredNode.x, hoveredNode.y + (hoveredNode.size ?? 1) + 1, hoveredNode.z]}
-          center
-          distanceFactor={30}
-          style={{ pointerEvents: 'none' }}
-        >
-          <TooltipContent node={hoveredNode} zoomLevel={zoomLevel} />
-        </Html>
-      )}
+      {hoveredNode && (() => {
+        // At global zoom, position tooltip outward from globe surface
+        if (zoomLevel === 'global') {
+          const len = Math.sqrt(hoveredNode.x ** 2 + hoveredNode.y ** 2 + hoveredNode.z ** 2)
+          const scale = len > 0.001 ? (len + 0.8) / len : 1
+          return (
+            <Html
+              position={[hoveredNode.x * scale, hoveredNode.y * scale, hoveredNode.z * scale]}
+              center
+              distanceFactor={12}
+              style={{ pointerEvents: 'none' }}
+            >
+              <TooltipContent node={hoveredNode} zoomLevel={zoomLevel} />
+            </Html>
+          )
+        }
+        return (
+          <Html
+            position={[hoveredNode.x, hoveredNode.y + (hoveredNode.size ?? 1) + 1, hoveredNode.z]}
+            center
+            distanceFactor={30}
+            style={{ pointerEvents: 'none' }}
+          >
+            <TooltipContent node={hoveredNode} zoomLevel={zoomLevel} />
+          </Html>
+        )
+      })()}
 
       {/* Labels */}
       {nodes
         .slice()
         .sort((a, b) => (b.marketCap ?? b.gdp ?? 0) - (a.marketCap ?? a.gdp ?? 0))
         .slice(0, labelCount)
-        .map((node) => (
-          <Html
-            key={`label-${node.id}`}
-            position={[node.x, node.y - (node.size ?? 1) - 0.6, node.z]}
-            center
-            distanceFactor={40}
-            style={{ pointerEvents: 'none' }}
-          >
-            <div className="text-[10px] font-mono text-slate-500 whitespace-nowrap">
-              {node.ticker ?? node.exchangeCode ?? node.countryCode ?? node.label}
-            </div>
-          </Html>
-        ))}
+        .map((node) => {
+          // At global zoom, position labels outward from globe surface
+          if (zoomLevel === 'global') {
+            const len = Math.sqrt(node.x ** 2 + node.y ** 2 + node.z ** 2)
+            const scale = len > 0.001 ? (len + 0.4) / len : 1
+            return (
+              <Html
+                key={`label-${node.id}`}
+                position={[node.x * scale, node.y * scale, node.z * scale]}
+                center
+                distanceFactor={12}
+                style={{ pointerEvents: 'none' }}
+              >
+                <div className="text-[9px] font-mono text-slate-400 whitespace-nowrap">
+                  {node.countryCode ?? node.label}
+                </div>
+              </Html>
+            )
+          }
+          return (
+            <Html
+              key={`label-${node.id}`}
+              position={[node.x, node.y - (node.size ?? 1) - 0.6, node.z]}
+              center
+              distanceFactor={40}
+              style={{ pointerEvents: 'none' }}
+            >
+              <div className="text-[10px] font-mono text-slate-500 whitespace-nowrap">
+                {node.ticker ?? node.exchangeCode ?? node.countryCode ?? node.label}
+              </div>
+            </Html>
+          )
+        })}
     </>
   )
 }

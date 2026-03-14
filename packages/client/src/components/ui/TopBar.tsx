@@ -1,6 +1,48 @@
+import { useState, useEffect } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import { useGDPCountries } from '../../hooks/useGDPData'
 import { getZoomPathLabels } from '../../lib/market-data'
+import { isMarketOpen, getMarketStatus } from '../../lib/market-hours'
+
+function MarketStatusIndicator() {
+  const [, setTick] = useState(0)
+
+  // Re-render every minute
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 60_000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const nyseOpen = isMarketOpen('NYSE')
+  const status = getMarketStatus('NYSE')
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
+        <span className="relative flex h-2 w-2">
+          {nyseOpen && (
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+          )}
+          <span
+            className={`relative inline-flex rounded-full h-2 w-2 ${
+              nyseOpen ? 'bg-green-500' : 'bg-slate-600'
+            }`}
+          />
+        </span>
+        <span
+          className={`text-[10px] font-mono tracking-wide ${
+            nyseOpen ? 'text-green-400' : 'text-slate-600'
+          }`}
+        >
+          US MARKETS: {nyseOpen ? 'OPEN' : 'CLOSED'}
+        </span>
+      </div>
+      <span className="text-[9px] font-mono text-slate-600">
+        {status.nextEvent} in {status.timeUntil}
+      </span>
+    </div>
+  )
+}
 
 export function TopBar() {
   const zoomLevel = useAppStore((s) => s.zoomLevel)
@@ -75,6 +117,7 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-3 pointer-events-auto">
+        <MarketStatusIndicator />
         <button
           onClick={toggleTradeArcs}
           className={`text-[10px] font-mono px-2 py-1 rounded border transition-colors ${
