@@ -1,4 +1,38 @@
-import type { EconNode, EconEdge } from '@econview/shared'
+import type { EconNode, EconEdge, WorldRegion } from '@econview/shared'
+
+// ── Country → Region mapping ────────────────────────────────────────────────────
+
+export const COUNTRY_REGIONS: Record<string, WorldRegion> = {
+  USA: 'north_america', CAN: 'north_america', MEX: 'north_america',
+  BRA: 'latin_america', ARG: 'latin_america', CHL: 'latin_america', COL: 'latin_america', PER: 'latin_america',
+  GBR: 'western_europe', DEU: 'western_europe', FRA: 'western_europe', ITA: 'western_europe', ESP: 'western_europe',
+  NLD: 'western_europe', CHE: 'western_europe', BEL: 'western_europe', SWE: 'western_europe', NOR: 'western_europe',
+  AUT: 'western_europe', DNK: 'western_europe', FIN: 'western_europe', IRL: 'western_europe', PRT: 'western_europe',
+  RUS: 'eastern_europe', POL: 'eastern_europe', TUR: 'eastern_europe', CZE: 'eastern_europe', KAZ: 'eastern_europe',
+  SAU: 'middle_east', ARE: 'middle_east', ISR: 'middle_east', QAT: 'middle_east', EGY: 'middle_east',
+  NGA: 'africa', ZAF: 'africa',
+  IND: 'south_asia', PAK: 'south_asia', BGD: 'south_asia',
+  CHN: 'east_asia', JPN: 'east_asia', KOR: 'east_asia', HKG: 'east_asia', TWN: 'east_asia',
+  IDN: 'southeast_asia', THA: 'southeast_asia', SGP: 'southeast_asia', PHL: 'southeast_asia', MYS: 'southeast_asia', VNM: 'southeast_asia',
+  AUS: 'oceania', NZL: 'oceania',
+}
+
+// ── Country currency codes ───────────────────────────────────────────────────
+
+export const COUNTRY_CURRENCIES: Record<string, string> = {
+  USA: 'USD', CAN: 'CAD', MEX: 'MXN', BRA: 'BRL', ARG: 'ARS', CHL: 'CLP', COL: 'COP', PER: 'PEN',
+  GBR: 'GBP', DEU: 'EUR', FRA: 'EUR', ITA: 'EUR', ESP: 'EUR', NLD: 'EUR', BEL: 'EUR', AUT: 'EUR',
+  IRL: 'EUR', PRT: 'EUR', FIN: 'EUR', CHE: 'CHF', SWE: 'SEK', NOR: 'NOK', DNK: 'DKK',
+  RUS: 'RUB', POL: 'PLN', TUR: 'TRY', CZE: 'CZK', KAZ: 'KZT',
+  SAU: 'SAR', ARE: 'AED', ISR: 'ILS', QAT: 'QAR', EGY: 'EGP',
+  NGA: 'NGN', ZAF: 'ZAR',
+  IND: 'INR', PAK: 'PKR', BGD: 'BDT',
+  CHN: 'CNY', JPN: 'JPY', KOR: 'KRW', HKG: 'HKD', TWN: 'TWD',
+  IDN: 'IDR', THA: 'THB', SGP: 'SGD', PHL: 'PHP', MYS: 'MYR', VNM: 'VND',
+  AUS: 'AUD', NZL: 'NZD',
+}
+
+// ── 50+ Major Economies ──────────────────────────────────────────────────────
 
 export const MOCK_COUNTRIES: EconNode[] = [
   { id: 'USA', type: 'country', label: 'United States', countryCode: 'USA', gdp: 27360e9, gdpGrowth: 2.5, population: 334e6, region: 'north_america', currency: 'USD', inflation: 3.1, unemployment: 3.7, debtToGdp: 123, interestRate: 4.33, creditRating: 'AAA' },
@@ -53,58 +87,85 @@ export const MOCK_COUNTRIES: EconNode[] = [
   { id: 'PAK', type: 'country', label: 'Pakistan', countryCode: 'PAK', gdp: 338e9, gdpGrowth: -0.2, population: 231e6, region: 'south_se_asia', currency: 'PKR', inflation: 28.3, unemployment: 6.3, debtToGdp: 75, interestRate: 22.00, creditRating: 'CCC+' },
 ]
 
-// Top bilateral trade relationships (value in USD billions)
+// ── Major bilateral trade relationships ────────────────────────────────────────────
+
 export const MOCK_TRADE_EDGES: EconEdge[] = [
   { id: 't1', source: 'USA', target: 'CHN', type: 'trade', weight: 1, value: 575e9, direction: 'bidirectional' },
   { id: 't2', source: 'USA', target: 'CAN', type: 'trade', weight: 0.9, value: 780e9, direction: 'bidirectional' },
   { id: 't3', source: 'USA', target: 'MEX', type: 'trade', weight: 0.85, value: 798e9, direction: 'bidirectional' },
-  { id: 't4', source: 'USA', target: 'DEU', type: 'trade', weight: 0.5, value: 263e9, direction: 'bidirectional' },
-  { id: 't5', source: 'USA', target: 'JPN', type: 'trade', weight: 0.5, value: 230e9, direction: 'bidirectional' },
-  { id: 't6', source: 'USA', target: 'KOR', type: 'trade', weight: 0.45, value: 185e9, direction: 'bidirectional' },
+  { id: 't4', source: 'USA', target: 'DEU', type: 'trade', weight: 0.6, value: 252e9, direction: 'bidirectional' },
+  { id: 't5', source: 'USA', target: 'JPN', type: 'trade', weight: 0.55, value: 226e9, direction: 'bidirectional' },
+  { id: 't6', source: 'USA', target: 'KOR', type: 'trade', weight: 0.5, value: 196e9, direction: 'bidirectional' },
   { id: 't7', source: 'USA', target: 'GBR', type: 'trade', weight: 0.45, value: 148e9, direction: 'bidirectional' },
-  { id: 't8', source: 'USA', target: 'IND', type: 'trade', weight: 0.4, value: 128e9, direction: 'bidirectional' },
-  { id: 't9', source: 'CHN', target: 'JPN', type: 'trade', weight: 0.55, value: 318e9, direction: 'bidirectional' },
-  { id: 't10', source: 'CHN', target: 'KOR', type: 'trade', weight: 0.55, value: 310e9, direction: 'bidirectional' },
-  { id: 't11', source: 'CHN', target: 'DEU', type: 'trade', weight: 0.4, value: 214e9, direction: 'bidirectional' },
-  { id: 't12', source: 'CHN', target: 'AUS', type: 'trade', weight: 0.35, value: 195e9, direction: 'bidirectional' },
-  { id: 't13', source: 'CHN', target: 'BRA', type: 'trade', weight: 0.35, value: 171e9, direction: 'bidirectional' },
-  { id: 't14', source: 'CHN', target: 'RUS', type: 'trade', weight: 0.35, value: 190e9, direction: 'bidirectional' },
-  { id: 't15', source: 'CHN', target: 'VNM', type: 'trade', weight: 0.3, value: 162e9, direction: 'bidirectional' },
-  { id: 't16', source: 'CHN', target: 'MYS', type: 'trade', weight: 0.25, value: 120e9, direction: 'bidirectional' },
-  { id: 't17', source: 'DEU', target: 'FRA', type: 'trade', weight: 0.4, value: 188e9, direction: 'bidirectional' },
-  { id: 't18', source: 'DEU', target: 'NLD', type: 'trade', weight: 0.35, value: 220e9, direction: 'bidirectional' },
-  { id: 't19', source: 'DEU', target: 'ITA', type: 'trade', weight: 0.3, value: 155e9, direction: 'bidirectional' },
-  { id: 't20', source: 'DEU', target: 'POL', type: 'trade', weight: 0.3, value: 148e9, direction: 'bidirectional' },
-  { id: 't21', source: 'DEU', target: 'CHE', type: 'trade', weight: 0.25, value: 112e9, direction: 'bidirectional' },
-  { id: 't22', source: 'DEU', target: 'AUT', type: 'trade', weight: 0.2, value: 98e9, direction: 'bidirectional' },
-  { id: 't23', source: 'DEU', target: 'GBR', type: 'trade', weight: 0.3, value: 130e9, direction: 'bidirectional' },
-  { id: 't24', source: 'JPN', target: 'KOR', type: 'trade', weight: 0.3, value: 82e9, direction: 'bidirectional' },
-  { id: 't25', source: 'JPN', target: 'AUS', type: 'trade', weight: 0.25, value: 75e9, direction: 'bidirectional' },
-  { id: 't26', source: 'JPN', target: 'THA', type: 'trade', weight: 0.2, value: 64e9, direction: 'bidirectional' },
-  { id: 't27', source: 'GBR', target: 'FRA', type: 'trade', weight: 0.25, value: 82e9, direction: 'bidirectional' },
-  { id: 't28', source: 'GBR', target: 'NLD', type: 'trade', weight: 0.25, value: 90e9, direction: 'bidirectional' },
-  { id: 't29', source: 'GBR', target: 'IRL', type: 'trade', weight: 0.2, value: 72e9, direction: 'bidirectional' },
-  { id: 't30', source: 'IND', target: 'ARE', type: 'trade', weight: 0.25, value: 85e9, direction: 'bidirectional' },
-  { id: 't31', source: 'IND', target: 'SAU', type: 'trade', weight: 0.2, value: 53e9, direction: 'bidirectional' },
-  { id: 't32', source: 'BRA', target: 'ARG', type: 'trade', weight: 0.2, value: 26e9, direction: 'bidirectional' },
-  { id: 't33', source: 'CAN', target: 'GBR', type: 'trade', weight: 0.15, value: 30e9, direction: 'bidirectional' },
-  { id: 't34', source: 'AUS', target: 'NZL', type: 'trade', weight: 0.15, value: 20e9, direction: 'bidirectional' },
-  { id: 't35', source: 'SGP', target: 'MYS', type: 'trade', weight: 0.2, value: 70e9, direction: 'bidirectional' },
-  { id: 't36', source: 'SGP', target: 'CHN', type: 'trade', weight: 0.25, value: 115e9, direction: 'bidirectional' },
-  { id: 't37', source: 'SAU', target: 'CHN', type: 'trade', weight: 0.3, value: 106e9, direction: 'source_to_target' },
-  { id: 't38', source: 'SAU', target: 'JPN', type: 'trade', weight: 0.2, value: 40e9, direction: 'source_to_target' },
-  { id: 't39', source: 'IDN', target: 'CHN', type: 'trade', weight: 0.25, value: 95e9, direction: 'bidirectional' },
-  { id: 't40', source: 'IDN', target: 'JPN', type: 'trade', weight: 0.2, value: 43e9, direction: 'bidirectional' },
-  { id: 't41', source: 'FRA', target: 'ITA', type: 'trade', weight: 0.25, value: 95e9, direction: 'bidirectional' },
-  { id: 't42', source: 'FRA', target: 'ESP', type: 'trade', weight: 0.25, value: 92e9, direction: 'bidirectional' },
-  { id: 't43', source: 'FRA', target: 'BEL', type: 'trade', weight: 0.2, value: 85e9, direction: 'bidirectional' },
-  { id: 't44', source: 'TUR', target: 'DEU', type: 'trade', weight: 0.2, value: 45e9, direction: 'bidirectional' },
-  { id: 't45', source: 'MEX', target: 'CHN', type: 'trade', weight: 0.2, value: 48e9, direction: 'bidirectional' },
-  { id: 't46', source: 'KOR', target: 'VNM', type: 'trade', weight: 0.2, value: 78e9, direction: 'bidirectional' },
-  { id: 't47', source: 'NLD', target: 'BEL', type: 'trade', weight: 0.2, value: 88e9, direction: 'bidirectional' },
-  { id: 't48', source: 'HKG', target: 'CHN', type: 'trade', weight: 0.35, value: 340e9, direction: 'bidirectional' },
-  { id: 't49', source: 'USA', target: 'BRA', type: 'trade', weight: 0.25, value: 92e9, direction: 'bidirectional' },
-  { id: 't50', source: 'USA', target: 'SGP', type: 'trade', weight: 0.2, value: 78e9, direction: 'bidirectional' },
+  { id: 't8', source: 'USA', target: 'IND', type: 'trade', weight: 0.5, value: 191e9, direction: 'bidirectional' },
+  { id: 't9', source: 'USA', target: 'TWN', type: 'trade', weight: 0.45, value: 127e9, direction: 'bidirectional' },
+  { id: 't10', source: 'USA', target: 'BRA', type: 'trade', weight: 0.3, value: 92e9, direction: 'bidirectional' },
+  { id: 't11', source: 'CHN', target: 'JPN', type: 'trade', weight: 0.65, value: 318e9, direction: 'bidirectional' },
+  { id: 't12', source: 'CHN', target: 'KOR', type: 'trade', weight: 0.7, value: 362e9, direction: 'bidirectional' },
+  { id: 't13', source: 'CHN', target: 'AUS', type: 'trade', weight: 0.55, value: 231e9, direction: 'bidirectional' },
+  { id: 't14', source: 'CHN', target: 'DEU', type: 'trade', weight: 0.5, value: 210e9, direction: 'bidirectional' },
+  { id: 't15', source: 'CHN', target: 'TWN', type: 'trade', weight: 0.55, value: 268e9, direction: 'bidirectional' },
+  { id: 't16', source: 'CHN', target: 'BRA', type: 'trade', weight: 0.45, value: 181e9, direction: 'bidirectional' },
+  { id: 't17', source: 'CHN', target: 'RUS', type: 'trade', weight: 0.4, value: 240e9, direction: 'bidirectional' },
+  { id: 't18', source: 'CHN', target: 'SAU', type: 'trade', weight: 0.35, value: 106e9, direction: 'bidirectional' },
+  { id: 't19', source: 'CHN', target: 'VNM', type: 'trade', weight: 0.4, value: 175e9, direction: 'bidirectional' },
+  { id: 't20', source: 'CHN', target: 'MYS', type: 'trade', weight: 0.3, value: 98e9, direction: 'bidirectional' },
+  { id: 't21', source: 'DEU', target: 'FRA', type: 'trade', weight: 0.65, value: 189e9, direction: 'bidirectional' },
+  { id: 't22', source: 'DEU', target: 'NLD', type: 'trade', weight: 0.55, value: 172e9, direction: 'bidirectional' },
+  { id: 't23', source: 'DEU', target: 'ITA', type: 'trade', weight: 0.45, value: 142e9, direction: 'bidirectional' },
+  { id: 't24', source: 'DEU', target: 'POL', type: 'trade', weight: 0.4, value: 125e9, direction: 'bidirectional' },
+  { id: 't25', source: 'DEU', target: 'CHE', type: 'trade', weight: 0.35, value: 98e9, direction: 'bidirectional' },
+  { id: 't26', source: 'DEU', target: 'AUT', type: 'trade', weight: 0.3, value: 85e9, direction: 'bidirectional' },
+  { id: 't27', source: 'FRA', target: 'ESP', type: 'trade', weight: 0.35, value: 95e9, direction: 'bidirectional' },
+  { id: 't28', source: 'FRA', target: 'ITA', type: 'trade', weight: 0.35, value: 88e9, direction: 'bidirectional' },
+  { id: 't29', source: 'FRA', target: 'BEL', type: 'trade', weight: 0.3, value: 82e9, direction: 'bidirectional' },
+  { id: 't30', source: 'GBR', target: 'NLD', type: 'trade', weight: 0.3, value: 72e9, direction: 'bidirectional' },
+  { id: 't31', source: 'JPN', target: 'KOR', type: 'trade', weight: 0.4, value: 82e9, direction: 'bidirectional' },
+  { id: 't32', source: 'JPN', target: 'AUS', type: 'trade', weight: 0.35, value: 68e9, direction: 'bidirectional' },
+  { id: 't33', source: 'JPN', target: 'TWN', type: 'trade', weight: 0.35, value: 75e9, direction: 'bidirectional' },
+  { id: 't34', source: 'JPN', target: 'THA', type: 'trade', weight: 0.3, value: 55e9, direction: 'bidirectional' },
+  { id: 't35', source: 'KOR', target: 'VNM', type: 'trade', weight: 0.3, value: 87e9, direction: 'bidirectional' },
+  { id: 't36', source: 'SGP', target: 'MYS', type: 'trade', weight: 0.35, value: 65e9, direction: 'bidirectional' },
+  { id: 't37', source: 'IND', target: 'ARE', type: 'trade', weight: 0.35, value: 85e9, direction: 'bidirectional' },
+  { id: 't38', source: 'IND', target: 'SAU', type: 'trade', weight: 0.3, value: 52e9, direction: 'bidirectional' },
+  { id: 't39', source: 'AUS', target: 'NZL', type: 'trade', weight: 0.2, value: 15e9, direction: 'bidirectional' },
+  { id: 't40', source: 'BRA', target: 'ARG', type: 'trade', weight: 0.25, value: 28e9, direction: 'bidirectional' },
+  { id: 't41', source: 'CAN', target: 'GBR', type: 'trade', weight: 0.2, value: 32e9, direction: 'bidirectional' },
+  { id: 't42', source: 'MEX', target: 'CHN', type: 'trade', weight: 0.25, value: 45e9, direction: 'bidirectional' },
+  { id: 't43', source: 'SAU', target: 'IND', type: 'trade', weight: 0.3, value: 52e9, direction: 'bidirectional' },
+  { id: 't44', source: 'SAU', target: 'JPN', type: 'trade', weight: 0.25, value: 42e9, direction: 'bidirectional' },
+  { id: 't45', source: 'ZAF', target: 'CHN', type: 'trade', weight: 0.2, value: 35e9, direction: 'bidirectional' },
+  { id: 't46', source: 'NGA', target: 'IND', type: 'trade', weight: 0.15, value: 15e9, direction: 'bidirectional' },
+  { id: 't47', source: 'RUS', target: 'CHN', type: 'trade', weight: 0.4, value: 240e9, direction: 'bidirectional' },
+  { id: 't48', source: 'RUS', target: 'IND', type: 'trade', weight: 0.25, value: 65e9, direction: 'bidirectional' },
+  { id: 't49', source: 'QAT', target: 'JPN', type: 'trade', weight: 0.15, value: 22e9, direction: 'bidirectional' },
+  { id: 't50', source: 'QAT', target: 'KOR', type: 'trade', weight: 0.15, value: 18e9, direction: 'bidirectional' },
+]
+
+export const MOCK_FDI_EDGES: EconEdge[] = [
+  { id: 'fdi1', source: 'USA', target: 'GBR', type: 'fdi', weight: 0.8, value: 851e9, direction: 'bidirectional' },
+  { id: 'fdi2', source: 'USA', target: 'NLD', type: 'fdi', weight: 0.7, value: 565e9, direction: 'bidirectional' },
+  { id: 'fdi3', source: 'USA', target: 'IRL', type: 'fdi', weight: 0.5, value: 375e9, direction: 'source_to_target' },
+  { id: 'fdi4', source: 'USA', target: 'CAN', type: 'fdi', weight: 0.5, value: 425e9, direction: 'bidirectional' },
+  { id: 'fdi5', source: 'JPN', target: 'USA', type: 'fdi', weight: 0.6, value: 721e9, direction: 'source_to_target' },
+  { id: 'fdi6', source: 'DEU', target: 'USA', type: 'fdi', weight: 0.5, value: 482e9, direction: 'source_to_target' },
+  { id: 'fdi7', source: 'CHN', target: 'USA', type: 'fdi', weight: 0.3, value: 38e9, direction: 'source_to_target' },
+  { id: 'fdi8', source: 'SGP', target: 'CHN', type: 'fdi', weight: 0.3, value: 55e9, direction: 'source_to_target' },
+  { id: 'fdi9', source: 'HKG', target: 'CHN', type: 'fdi', weight: 0.7, value: 102e9, direction: 'source_to_target' },
+  { id: 'fdi10', source: 'USA', target: 'IND', type: 'fdi', weight: 0.3, value: 46e9, direction: 'source_to_target' },
+]
+
+export const MOCK_REMITTANCE_EDGES: EconEdge[] = [
+  { id: 'rem1', source: 'USA', target: 'MEX', type: 'remittance', weight: 0.8, value: 63e9, direction: 'source_to_target' },
+  { id: 'rem2', source: 'USA', target: 'IND', type: 'remittance', weight: 0.6, value: 28e9, direction: 'source_to_target' },
+  { id: 'rem3', source: 'USA', target: 'PHL', type: 'remittance', weight: 0.5, value: 18e9, direction: 'source_to_target' },
+  { id: 'rem4', source: 'SAU', target: 'IND', type: 'remittance', weight: 0.5, value: 21e9, direction: 'source_to_target' },
+  { id: 'rem5', source: 'ARE', target: 'IND', type: 'remittance', weight: 0.4, value: 18e9, direction: 'source_to_target' },
+  { id: 'rem6', source: 'SAU', target: 'PAK', type: 'remittance', weight: 0.3, value: 7e9, direction: 'source_to_target' },
+  { id: 'rem7', source: 'SAU', target: 'EGY', type: 'remittance', weight: 0.3, value: 6e9, direction: 'source_to_target' },
+  { id: 'rem8', source: 'SAU', target: 'BGD', type: 'remittance', weight: 0.3, value: 5e9, direction: 'source_to_target' },
+  { id: 'rem9', source: 'USA', target: 'CHN', type: 'remittance', weight: 0.2, value: 5e9, direction: 'source_to_target' },
+  { id: 'rem10', source: 'DEU', target: 'TUR', type: 'remittance', weight: 0.2, value: 3e9, direction: 'source_to_target' },
 ]
 
 export const MOCK_STOCKS = [
@@ -118,6 +179,11 @@ export const MOCK_STOCKS = [
   { symbol: 'AMZN', name: 'Amazon', price: 225.60, change: 1.12 },
   { symbol: 'META', name: 'Meta', price: 620.80, change: -0.55 },
   { symbol: 'TSLA', name: 'Tesla', price: 175.90, change: -1.85 },
+  { symbol: 'FTSE', name: 'FTSE 100', price: 7850.00, change: 0.32 },
+  { symbol: 'DAX', name: 'DAX 40', price: 18200.00, change: -0.15 },
+  { symbol: 'N225', name: 'Nikkei 225', price: 38500.00, change: 0.85 },
+  { symbol: 'HSI', name: 'Hang Seng', price: 17200.00, change: 1.25 },
+  { symbol: 'SENSEX', name: 'BSE Sensex', price: 73500.00, change: 0.45 },
 ]
 
 export const MOCK_CRYPTO = [

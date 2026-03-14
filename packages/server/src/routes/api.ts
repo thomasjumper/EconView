@@ -194,6 +194,75 @@ router.get('/api/alerts', (_req, res) => {
 })
 
 // ---------------------------------------------------------------------------
+// Commodities
+// ---------------------------------------------------------------------------
+
+router.get('/api/commodities', async (_req, res) => {
+  try {
+    const data = await fetchCommodityPrices()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/commodities error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+router.get('/api/commodities/:category', async (req, res) => {
+  try {
+    const { category } = req.params
+    const data = getCommoditiesByCategory(category)
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/commodities/:category error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Forex
+// ---------------------------------------------------------------------------
+
+router.get('/api/forex', async (_req, res) => {
+  try {
+    const rates = await fetchForexRates()
+    const dxy = getDollarStrength()
+    res.json({ ok: true, data: { rates, dollarIndex: dxy } })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/forex error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Global Economic Indicators
+// ---------------------------------------------------------------------------
+
+router.get('/api/indicators', async (req, res) => {
+  try {
+    const category = req.query.category as string | undefined
+    const country = req.query.country as string | undefined
+
+    if (country) {
+      const data = getCountryIndicators(country)
+      res.json({ ok: true, data })
+    } else if (category) {
+      const data = getIndicatorsByCategory(category)
+      res.json({ ok: true, data })
+    } else {
+      const data = await fetchGlobalIndicators()
+      res.json({ ok: true, data })
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/indicators error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
 // AI Natural Language Query
 // ---------------------------------------------------------------------------
 
@@ -317,6 +386,9 @@ router.get('/api/health', (_req, res) => {
       timescaledb: process.env.TIMESCALE_URL ? 'available' : 'not_configured',
       gdelt: 'available',
       anthropic: process.env.ANTHROPIC_API_KEY ? 'available' : 'missing_api_key',
+      commodities: 'available',
+      forex: 'available',
+      globalIndicators: 'available',
     },
   })
 })

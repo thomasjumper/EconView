@@ -7,7 +7,7 @@ import { useAppStore } from '../../store/useAppStore'
 import { useVisualMode } from '../../hooks/useVisualMode'
 import type { ZoomLevel } from '@econview/shared'
 
-// ── Color helpers ───────────────────────────────────────────────────────
+// ── Color helpers ───────────────────────────────────────────────────────────
 
 function growthToColor(growth: number): THREE.Color {
   const t = Math.max(0, Math.min(1, (growth + 2) / 10))
@@ -26,7 +26,6 @@ function hexToColor(hex: string): THREE.Color {
 
 function getNodeColor(node: LayoutNode, zoomLevel: ZoomLevel, visualMode: string): THREE.Color {
   if (zoomLevel === 'global') {
-    // In default mode, use flag color if available
     if (visualMode === 'default' && node.color) {
       return hexToColor(node.color)
     }
@@ -38,7 +37,7 @@ function getNodeColor(node: LayoutNode, zoomLevel: ZoomLevel, visualMode: string
   return new THREE.Color('#00D4FF')
 }
 
-// ── Format helpers ──────────────────────────────────────────────────────
+// ── Format helpers ──────────────────────────────────────────────────────────
 
 function formatValue(v: number): string {
   if (v >= 1e12) return `$${(v / 1e12).toFixed(1)}T`
@@ -47,7 +46,7 @@ function formatValue(v: number): string {
   return `$${v.toLocaleString()}`
 }
 
-// ── Tooltip content by zoom level ───────────────────────────────────────
+// ── Tooltip content by zoom level ──────────────────────────────────────────────
 
 function TooltipContent({ node, zoomLevel }: { node: LayoutNode; zoomLevel: ZoomLevel }) {
   if (zoomLevel === 'global') {
@@ -111,7 +110,7 @@ function TooltipContent({ node, zoomLevel }: { node: LayoutNode; zoomLevel: Zoom
   )
 }
 
-// ── Main Component ──────────────────────────────────────────────────────
+// ── Main Component ──────────────────────────────────────────────────────────
 
 interface DrillDownNodesProps {
   nodes: LayoutNode[]

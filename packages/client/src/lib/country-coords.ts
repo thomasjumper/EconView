@@ -54,6 +54,7 @@ export const COUNTRY_COORDS: Record<string, { lat: number; lon: number }> = {
   KAZ: { lat: 51.2, lon: 71.4 },    // Astana
   PER: { lat: -12.0, lon: -77.0 },  // Lima
   PAK: { lat: 33.7, lon: 73.0 },    // Islamabad
+  TWN: { lat: 25.0, lon: 121.5 },   // Taipei
 }
 
 /**

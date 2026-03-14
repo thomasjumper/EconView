@@ -8,6 +8,9 @@ export const COLORS = {
   red: '#FF4545',
   amber: '#F59E0B',
   neutral: '#94A3B8',
+  purple: '#8B5CF6',
+  pink: '#EC4899',
+  teal: '#14B8A6',
 } as const
 
 export const FINNHUB_WS_MAX_SYMBOLS = 50

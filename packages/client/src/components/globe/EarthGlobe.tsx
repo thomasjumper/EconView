@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
+import { useTexture } from '@react-three/drei'
 
 // ── Simplified country boundary arcs (lat/lon pairs for major landmass outlines) ──
 // Stored as [lon, lat] pairs, grouped into polylines
@@ -102,11 +103,11 @@ const globeFragmentShader = `
     lonLine = smoothstep(0.97, 1.0, lonLine) * 0.03;
     float grid = max(latLine, lonLine);
 
-    vec3 finalColor = dayColor + nightGlow + vec3(grid) * vec3(0.1, 0.2, 0.4);
+    vec3 finalColor = dayColor + nightGlow + vec3(grid) * vec3(0.15, 0.3, 0.5);
 
     // Slight terminator glow
-    float terminatorGlow = exp(-pow((sunDot + 0.05) * 8.0, 2.0)) * 0.15;
-    finalColor += vec3(0.1, 0.15, 0.3) * terminatorGlow;
+    float terminatorGlow = exp(-pow((sunDot + 0.05) * 8.0, 2.0)) * 0.2;
+    finalColor += vec3(0.1, 0.2, 0.4) * terminatorGlow;
 
     // Rim darkening (edges of sphere)
     vec3 viewDir = normalize(-vPosition);

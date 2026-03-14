@@ -3,11 +3,19 @@ import { Html } from '@react-three/drei'
 import type { LayoutNode } from '../../hooks/useForceLayout'
 import { useAppStore } from '../../store/useAppStore'
 
-const reticleStyle = `
-  @keyframes reticle-spin {
-    to { transform: rotate(360deg); }
-  }
-`
+// Inject reticle keyframes into document head once (NOT inside Canvas)
+let styleInjected = false
+function injectReticleStyle() {
+  if (styleInjected || typeof document === 'undefined') return
+  const style = document.createElement('style')
+  style.textContent = `
+    @keyframes reticle-spin {
+      to { transform: rotate(360deg); }
+    }
+  `
+  document.head.appendChild(style)
+  styleInjected = true
+}
 
 interface RiskReticlesProps {
   nodes: LayoutNode[]
