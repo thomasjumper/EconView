@@ -38,13 +38,15 @@ export function useForceLayout(
     const maxGdp = Math.max(...nodes.map((n) => n.gdp ?? 1))
     const simNodes: LayoutNode[] = nodes.map((n) => {
       const gdp = n.gdp ?? 1
-      const logSize = Math.log10(gdp) / Math.log10(maxGdp)
+      const cap = n.marketCap ?? gdp
+      const maxVal = Math.max(...nodes.map((nd) => nd.marketCap ?? nd.gdp ?? 1))
+      const logSize = Math.log10(cap) / Math.log10(maxVal)
       return {
         ...n,
-        size: (0.3 + logSize * 1.5) * nodeScaleMultiplier,
-        x: (Math.random() - 0.5) * 50,
-        y: (Math.random() - 0.5) * 50,
-        z: (Math.random() - 0.5) * 50,
+        size: (0.4 + logSize * 2.0) * nodeScaleMultiplier,
+        x: (Math.random() - 0.5) * 15,
+        y: (Math.random() - 0.5) * 15,
+        z: (Math.random() - 0.5) * 15,
       }
     })
 

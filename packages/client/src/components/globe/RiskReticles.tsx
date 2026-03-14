@@ -1,13 +1,21 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { Html } from '@react-three/drei'
 import type { LayoutNode } from '../../hooks/useForceLayout'
 import { useAppStore } from '../../store/useAppStore'
 
-const reticleStyle = `
-  @keyframes reticle-spin {
-    to { transform: rotate(360deg); }
-  }
-`
+// Inject reticle keyframes into document head once (NOT inside Canvas)
+let styleInjected = false
+function injectReticleStyle() {
+  if (styleInjected || typeof document === 'undefined') return
+  const style = document.createElement('style')
+  style.textContent = `
+    @keyframes reticle-spin {
+      to { transform: rotate(360deg); }
+    }
+  `
+  document.head.appendChild(style)
+  styleInjected = true
+}
 
 interface RiskReticlesProps {
   nodes: LayoutNode[]
@@ -15,6 +23,11 @@ interface RiskReticlesProps {
 
 export function RiskReticles({ nodes }: RiskReticlesProps) {
   const visualMode = useAppStore((s) => s.visualMode)
+
+  // Inject CSS into document.head (safe for R3F Canvas)
+  useEffect(() => {
+    injectReticleStyle()
+  }, [])
 
   // Top 5 highest-risk nodes (lowest/most negative gdpGrowth)
   const riskNodes = useMemo(() => {
@@ -28,7 +41,6 @@ export function RiskReticles({ nodes }: RiskReticlesProps) {
 
   return (
     <>
-      <style>{reticleStyle}</style>
       {riskNodes.map((node) => {
         const riskLevel = Math.abs(node.gdpGrowth ?? 0)
         const size = Math.max(40, Math.min(80, 40 + riskLevel * 8))

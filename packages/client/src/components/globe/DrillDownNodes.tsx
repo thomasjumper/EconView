@@ -7,7 +7,7 @@ import { useAppStore } from '../../store/useAppStore'
 import { useVisualMode } from '../../hooks/useVisualMode'
 import type { ZoomLevel } from '@econview/shared'
 
-// ── Color helpers ───────────────────────────────────────────────────────
+// ── Color helpers ───────────────────────────────────────────────────────────
 
 function growthToColor(growth: number): THREE.Color {
   const t = Math.max(0, Math.min(1, (growth + 2) / 10))
@@ -26,7 +26,6 @@ function hexToColor(hex: string): THREE.Color {
 
 function getNodeColor(node: LayoutNode, zoomLevel: ZoomLevel, visualMode: string): THREE.Color {
   if (zoomLevel === 'global') {
-    // In default mode, use flag color if available
     if (visualMode === 'default' && node.color) {
       return hexToColor(node.color)
     }
@@ -38,7 +37,7 @@ function getNodeColor(node: LayoutNode, zoomLevel: ZoomLevel, visualMode: string
   return new THREE.Color('#00D4FF')
 }
 
-// ── Format helpers ──────────────────────────────────────────────────────
+// ── Format helpers ──────────────────────────────────────────────────────────
 
 function formatValue(v: number): string {
   if (v >= 1e12) return `$${(v / 1e12).toFixed(1)}T`
@@ -47,7 +46,7 @@ function formatValue(v: number): string {
   return `$${v.toLocaleString()}`
 }
 
-// ── Tooltip content by zoom level ───────────────────────────────────────
+// ── Tooltip content by zoom level ──────────────────────────────────────────────
 
 function TooltipContent({ node, zoomLevel }: { node: LayoutNode; zoomLevel: ZoomLevel }) {
   if (zoomLevel === 'global') {
@@ -111,7 +110,7 @@ function TooltipContent({ node, zoomLevel }: { node: LayoutNode; zoomLevel: Zoom
   )
 }
 
-// ── Main Component ──────────────────────────────────────────────────────
+// ── Main Component ──────────────────────────────────────────────────────────
 
 interface DrillDownNodesProps {
   nodes: LayoutNode[]
@@ -131,6 +130,7 @@ export function DrillDownNodes({ nodes, onNodeClick }: DrillDownNodesProps) {
 
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const colorArray = useMemo(() => new Float32Array(Math.max(nodes.length, 1) * 3), [nodes.length])
+  const colorAttrRef = useRef<THREE.InstancedBufferAttribute | null>(null)
 
   useFrame(() => {
     if (!meshRef.current || nodes.length === 0) return
@@ -161,10 +161,15 @@ export function DrillDownNodes({ nodes, onNodeClick }: DrillDownNodesProps) {
     }
 
     meshRef.current.instanceMatrix.needsUpdate = true
-    meshRef.current.geometry.setAttribute(
-      'color',
-      new THREE.InstancedBufferAttribute(colorArray, 3),
-    )
+
+    // Reuse the existing buffer attribute instead of creating a new one every frame
+    if (!colorAttrRef.current || colorAttrRef.current.count !== nodes.length) {
+      colorAttrRef.current = new THREE.InstancedBufferAttribute(colorArray, 3)
+      meshRef.current.geometry.setAttribute('color', colorAttrRef.current)
+    } else {
+      colorAttrRef.current.set(colorArray)
+      colorAttrRef.current.needsUpdate = true
+    }
   })
 
   const handlePointerOver = useCallback(

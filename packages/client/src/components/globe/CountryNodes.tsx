@@ -35,6 +35,7 @@ export function CountryNodes({ nodes }: CountryNodesProps) {
 
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const colorArray = useMemo(() => new Float32Array(nodes.length * 3), [nodes.length])
+  const colorAttrRef = useRef<THREE.InstancedBufferAttribute | null>(null)
 
   // Update instance matrices and colors
   useFrame(() => {
@@ -58,10 +59,13 @@ export function CountryNodes({ nodes }: CountryNodesProps) {
     }
 
     meshRef.current.instanceMatrix.needsUpdate = true
-    meshRef.current.geometry.setAttribute(
-      'color',
-      new THREE.InstancedBufferAttribute(colorArray, 3),
-    )
+    if (!colorAttrRef.current || colorAttrRef.current.count !== nodes.length) {
+      colorAttrRef.current = new THREE.InstancedBufferAttribute(colorArray, 3)
+      meshRef.current.geometry.setAttribute('color', colorAttrRef.current)
+    } else {
+      colorAttrRef.current.set(colorArray)
+      colorAttrRef.current.needsUpdate = true
+    }
   })
 
   const handlePointerOver = useCallback(
