@@ -14,6 +14,9 @@ import { startCryptoPolling } from './services/coingecko.js'
 import { initializeSchema } from './services/timescaledb.js'
 import { startRecording } from './scheduler/recorder.js'
 import { startAlertMonitor } from './services/alerts.js'
+import { fetchShippingLanes } from './services/vessel-tracking.js'
+import { fetchPortStatus } from './services/port-data.js'
+import { startEventDetection } from './services/event-detector.js'
 
 const app = express()
 const httpServer = createServer(app)
@@ -68,6 +71,20 @@ initializeSchema()
 
 // Start alert monitoring (every 2 minutes)
 startAlertMonitor(io, 2 * 60 * 1000)
+
+// Start event detection (every 5 minutes)
+startEventDetection(io, 5 * 60 * 1000)
+
+// Broadcast vessel lane and port congestion updates every 30 seconds
+setInterval(async () => {
+  try {
+    const [lanes, ports] = await Promise.all([fetchShippingLanes(), fetchPortStatus()])
+    io.emit('vessel:lanes', lanes)
+    io.emit('port:congestion', ports)
+  } catch (err) {
+    console.error('[EconView] vessel/port broadcast error:', (err as Error).message)
+  }
+}, 30_000)
 
 httpServer.listen(PORT, () => {
   console.log(`[EconView] Server running on port ${PORT}`)

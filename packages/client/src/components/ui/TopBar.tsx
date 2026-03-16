@@ -52,6 +52,10 @@ export function TopBar() {
   const toggleTradeArcs = useAppStore((s) => s.toggleTradeArcs)
   const showScanLines = useAppStore((s) => s.showScanLines)
   const toggleScanLines = useAppStore((s) => s.toggleScanLines)
+  const showShippingLanes = useAppStore((s) => s.showShippingLanes)
+  const toggleShippingLanes = useAppStore((s) => s.toggleShippingLanes)
+  const showPorts = useAppStore((s) => s.showPorts)
+  const togglePorts = useAppStore((s) => s.togglePorts)
 
   const countryNodes = useGDPCountries()
   const pathLabels = getZoomPathLabels(zoomPath, countryNodes)
@@ -129,6 +133,26 @@ export function TopBar() {
           }`}
         >
           TRADE FLOWS
+        </button>
+        <button
+          onClick={toggleShippingLanes}
+          className={`text-[10px] font-mono px-2 py-1 rounded border transition-colors ${
+            showShippingLanes
+              ? 'border-econ-blue/40 text-econ-blue bg-econ-blue/10'
+              : 'border-slate-700 text-slate-500 hover:text-slate-400'
+          }`}
+        >
+          SHIPPING
+        </button>
+        <button
+          onClick={togglePorts}
+          className={`text-[10px] font-mono px-2 py-1 rounded border transition-colors ${
+            showPorts
+              ? 'border-econ-blue/40 text-econ-blue bg-econ-blue/10'
+              : 'border-slate-700 text-slate-500 hover:text-slate-400'
+          }`}
+        >
+          PORTS
         </button>
         <button
           onClick={toggleScanLines}

@@ -193,3 +193,127 @@ export interface ConflictData {
   trend: 'escalating' | 'de-escalating' | 'stable'
   primaryType: string
 }
+
+// ---------------------------------------------------------------------------
+// Vessel Tracking & Shipping
+// ---------------------------------------------------------------------------
+
+export type VesselType = 'container' | 'tanker' | 'bulk_carrier' | 'lng' | 'car_carrier' | 'cruise' | 'other'
+export type CargoType = 'crude_oil' | 'refined_products' | 'lng' | 'coal' | 'iron_ore' | 'grain' | 'containers' | 'vehicles' | 'chemicals' | 'unknown'
+
+export interface VesselPosition {
+  mmsi: string
+  name: string
+  type: VesselType
+  lat: number
+  lon: number
+  heading: number
+  speed: number
+  destination: string
+  origin: string
+  eta: string
+  cargo: CargoType
+  estimatedValue: number
+  dwt: number
+  flag: string
+}
+
+export interface ShippingLane {
+  id: string
+  name: string
+  origin: string
+  destination: string
+  activeVessels: number
+  avgTransitDays: number
+  estimatedDailyValue: number
+  congestionIndex: number
+  waypoints: [number, number][]
+  trend: 'increasing' | 'stable' | 'decreasing'
+  cargoType: CargoType
+}
+
+export interface PortStatus {
+  id: string
+  name: string
+  country: string
+  lat: number
+  lon: number
+  annualTEU: number
+  currentCongestion: number
+  avgWaitDays: number
+  vesselsAtAnchor: number
+  throughputTrend: 'up' | 'stable' | 'down'
+  topTradePartners: string[]
+}
+
+// ---------------------------------------------------------------------------
+// Capital and Debt Flows
+// ---------------------------------------------------------------------------
+
+export interface CapitalFlow {
+  id: string
+  source: string
+  target: string
+  flowType: 'portfolio' | 'fdi' | 'banking' | 'central_bank' | 'remittance' | 'trade_settlement'
+  dailyVolume: number
+  netDirection: 'source_to_target' | 'target_to_source'
+  velocity: number
+  trend: 'accelerating' | 'stable' | 'decelerating'
+}
+
+export interface DebtFlow {
+  id: string
+  holder: string
+  issuer: string
+  amount: number
+  change30d: number
+  instrumentType: 'treasury' | 'sovereign_bond' | 'corporate_bond'
+}
+
+// ---------------------------------------------------------------------------
+// Events and Cascades
+// ---------------------------------------------------------------------------
+
+export type EventType = 'shipping_disruption' | 'trade_policy' | 'commodity_shock' | 'currency_crisis' | 'central_bank_action' | 'geopolitical' | 'supply_chain_break' | 'financial_contagion' | 'natural_disaster' | 'market_crash'
+
+export interface CascadeStep {
+  order: number
+  entity: string
+  entityType: 'country' | 'commodity' | 'sector' | 'company' | 'currency' | 'shipping_lane'
+  impact: 'positive' | 'negative' | 'neutral'
+  magnitude: number
+  mechanism: string
+  estimatedDelay: string
+  confidence: number
+}
+
+export interface EconomicEvent {
+  id: string
+  timestamp: string
+  type: EventType
+  severity: 'info' | 'warning' | 'critical'
+  title: string
+  description: string
+  location: { lat: number; lon: number; countryCode?: string }
+  affectedEntities: string[]
+  estimatedImpact: number
+  cascadeChain: CascadeStep[]
+}
+
+export interface Scenario {
+  id: string
+  label: string
+  description: string
+  eventType: EventType
+  severity: 'mild' | 'moderate' | 'severe' | 'catastrophic'
+  duration: string
+  params: Record<string, unknown>
+}
+
+export interface ScenarioResult {
+  scenario: Scenario
+  cascadeChain: CascadeStep[]
+  affectedCountries: string[]
+  estimatedGlobalImpact: number
+  narration: string
+}

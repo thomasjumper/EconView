@@ -9,8 +9,11 @@ import { DrillDownNodes } from './DrillDownNodes'
 import { NetworkGraph } from './NetworkGraph'
 import { TradeEdges } from './TradeEdges'
 import { FlowParticles } from './FlowParticles'
+import { ShippingLanes } from './ShippingLanes'
+import { PortMarkers } from './PortMarkers'
 import { ShaderModes } from './ShaderModes'
 import { RiskReticles } from './RiskReticles'
+import { CascadeRipple } from './CascadeRipple'
 import { useForceLayout, type LayoutNode } from '../../hooks/useForceLayout'
 import { useGlobeLayout } from '../../hooks/useGlobeLayout'
 import { useVisualMode } from '../../hooks/useVisualMode'
@@ -19,22 +22,32 @@ import { useGDPCountries } from '../../hooks/useGDPData'
 import { useTimelineData } from '../../hooks/useHistoricalData'
 import { useTimelineStore } from '../../store/useTimelineStore'
 import { useZoomTransition } from '../../hooks/useZoomTransition'
+import { useShippingLanes } from '../../hooks/useShippingData'
+import { usePortData } from '../../hooks/usePortData'
 import { getNodesForZoom, getEdgesForZoom } from '../../lib/market-data'
 import { MOCK_TRADE_EDGES } from '../../lib/mock-data'
 
 function SceneContent() {
   const showTradeArcs = useAppStore((s) => s.showTradeArcs)
+  const showShippingLanes = useAppStore((s) => s.showShippingLanes)
+  const showPorts = useAppStore((s) => s.showPorts)
   const zoomLevel = useAppStore((s) => s.zoomLevel)
   const zoomPath = useAppStore((s) => s.zoomPath)
   const zoomOut = useAppStore((s) => s.zoomOut)
   const visualMode = useAppStore((s) => s.visualMode)
   const debug = useAppStore((s) => s.debug)
 
+  const activeCascade = useAppStore((s) => s.activeCascade)
+
   const modeOverrides = useVisualMode()
 
   const isReplayMode = useTimelineStore((s) => s.isReplayMode)
   const countryNodes = useGDPCountries()
   const timelineData = useTimelineData()
+
+  // Shipping & port data
+  const { data: shippingLanes } = useShippingLanes()
+  const { data: portStatuses } = usePortData()
 
   // Get nodes appropriate for current zoom level
   // In replay mode, use timeline-driven data; otherwise use present-day data
@@ -134,6 +147,25 @@ function SceneContent() {
         nodes={layoutNodes}
         edges={currentEdges}
         visible={flowParticlesVisible}
+      />
+
+      {/* Shipping lanes */}
+      <ShippingLanes
+        lanes={shippingLanes ?? []}
+        visible={showShippingLanes && zoomLevel === 'global'}
+      />
+
+      {/* Port markers */}
+      <PortMarkers
+        ports={portStatuses ?? []}
+        visible={showPorts && zoomLevel === 'global'}
+      />
+
+      {/* Cascade ripple visualization */}
+      <CascadeRipple
+        epicenter={activeCascade.epicenter}
+        cascadeSteps={activeCascade.steps}
+        active={activeCascade.active}
       />
 
       {/* Risk reticles on high-risk nodes */}

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { ZoomLevel, EconNode } from '@econview/shared'
+import type { ZoomLevel, EconNode, CascadeStep } from '@econview/shared'
 
 export type VisualMode = 'default' | 'heat' | 'flow' | 'risk' | 'sentiment' | 'xray'
 
@@ -38,6 +38,18 @@ interface AppState {
   showCalendar: boolean
   showCreditPanel: boolean
   showDeFiPanel: boolean
+  showShippingLanes: boolean
+  showPorts: boolean
+  showFlowPanel: boolean
+  showCascadePanel: boolean
+  showScenarioPanel: boolean
+  activeCascade: {
+    epicenter: { lat: number; lon: number } | null
+    steps: CascadeStep[]
+    active: boolean
+  }
+  simulationMode: boolean
+  cascadeHighlights: string[]
   compareNodes: string[]
   voiceEnabled: boolean
 
@@ -56,6 +68,18 @@ interface AppState {
   toggleCalendar: () => void
   toggleCreditPanel: () => void
   toggleDeFiPanel: () => void
+  toggleShippingLanes: () => void
+  togglePorts: () => void
+  toggleFlowPanel: () => void
+  toggleCascadePanel: () => void
+  toggleScenarioPanel: () => void
+  setActiveCascade: (cascade: {
+    epicenter: { lat: number; lon: number } | null
+    steps: CascadeStep[]
+    active: boolean
+  }) => void
+  setSimulationMode: (on: boolean) => void
+  setCascadeHighlights: (ids: string[]) => void
   setCompareNodes: (ids: string[]) => void
   toggleVoice: () => void
   drillDown: (nodeId: string) => void
@@ -81,6 +105,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   showCalendar: false,
   showCreditPanel: false,
   showDeFiPanel: false,
+  showShippingLanes: true,
+  showPorts: true,
+  showFlowPanel: false,
+  showCascadePanel: false,
+  showScenarioPanel: false,
+  activeCascade: { epicenter: null, steps: [], active: false },
+  simulationMode: false,
+  cascadeHighlights: [],
   compareNodes: [],
   voiceEnabled: false,
 
@@ -99,6 +131,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   toggleCalendar: () => set((s) => ({ showCalendar: !s.showCalendar })),
   toggleCreditPanel: () => set((s) => ({ showCreditPanel: !s.showCreditPanel })),
   toggleDeFiPanel: () => set((s) => ({ showDeFiPanel: !s.showDeFiPanel })),
+  toggleShippingLanes: () => set((s) => ({ showShippingLanes: !s.showShippingLanes })),
+  togglePorts: () => set((s) => ({ showPorts: !s.showPorts })),
+  toggleFlowPanel: () => set((s) => ({ showFlowPanel: !s.showFlowPanel })),
+  toggleCascadePanel: () => set((s) => ({ showCascadePanel: !s.showCascadePanel })),
+  toggleScenarioPanel: () => set((s) => ({ showScenarioPanel: !s.showScenarioPanel })),
+  setActiveCascade: (cascade) => set({ activeCascade: cascade }),
+  setSimulationMode: (on) => set({ simulationMode: on }),
+  setCascadeHighlights: (ids) => set({ cascadeHighlights: ids }),
   setCompareNodes: (ids) => set({ compareNodes: ids }),
   toggleVoice: () => set((s) => ({ voiceEnabled: !s.voiceEnabled })),
 

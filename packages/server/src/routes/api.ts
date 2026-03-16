@@ -32,6 +32,13 @@ import { fetchSupplyChainPressure } from '../services/supply-chain.js'
 import { fetchPropertyPrices } from '../services/property.js'
 import { fetchDevelopmentIndicators } from '../services/wb-indicators.js'
 import { fetchConflictData } from '../services/conflict.js'
+import { fetchVesselPositions, fetchShippingLanes } from '../services/vessel-tracking.js'
+import { fetchPortStatus } from '../services/port-data.js'
+import { fetchCapitalFlows } from '../services/capital-flows.js'
+import { fetchDebtFlows } from '../services/debt-flows.js'
+import { getRecentEvents } from '../services/event-detector.js'
+import { simulateCascade } from '../services/cascade-engine.js'
+import { getPresetScenarios, simulateScenario, simulateCustomScenario } from '../services/scenario-engine.js'
 
 const router: RouterType = Router()
 
@@ -573,6 +580,196 @@ router.get('/api/conflict', async (_req, res) => {
 })
 
 // ---------------------------------------------------------------------------
+// Vessel Tracking
+// ---------------------------------------------------------------------------
+
+router.get('/api/vessels', async (_req, res) => {
+  try {
+    const data = await fetchVesselPositions()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/vessels error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+router.get('/api/vessels/lanes', async (_req, res) => {
+  try {
+    const data = await fetchShippingLanes()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/vessels/lanes error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Port Status
+// ---------------------------------------------------------------------------
+
+router.get('/api/ports', async (_req, res) => {
+  try {
+    const data = await fetchPortStatus()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/ports error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Capital Flows
+// ---------------------------------------------------------------------------
+
+router.get('/api/flows/capital', async (_req, res) => {
+  try {
+    const data = await fetchCapitalFlows()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/flows/capital error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Sovereign Debt Holdings
+// ---------------------------------------------------------------------------
+
+router.get('/api/flows/debt', async (_req, res) => {
+  try {
+    const data = await fetchDebtFlows()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/flows/debt error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Flow Summary (aggregated)
+// ---------------------------------------------------------------------------
+
+router.get('/api/flows/summary', async (_req, res) => {
+  try {
+    const [capital, debt] = await Promise.all([fetchCapitalFlows(), fetchDebtFlows()])
+
+    const totalCapitalVolume = capital.reduce((sum, f) => sum + f.dailyVolume, 0)
+    const totalDebtHoldings = debt.reduce((sum, d) => sum + d.amount, 0)
+    const totalDebtChange = debt.reduce((sum, d) => sum + d.change30d, 0)
+
+    const byFlowType: Record<string, number> = {}
+    for (const f of capital) {
+      byFlowType[f.flowType] = (byFlowType[f.flowType] || 0) + f.dailyVolume
+    }
+
+    res.json({
+      ok: true,
+      data: {
+        capitalFlows: {
+          count: capital.length,
+          totalDailyVolumeM: totalCapitalVolume,
+          byFlowType,
+        },
+        debtHoldings: {
+          count: debt.length,
+          totalAmountB: totalDebtHoldings,
+          totalChange30dB: totalDebtChange,
+        },
+      },
+    })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/flows/summary error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Economic Events
+// ---------------------------------------------------------------------------
+
+router.get('/api/events', (_req, res) => {
+  try {
+    const events = getRecentEvents()
+    res.json({ ok: true, data: events })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/events error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+router.get('/api/events/:id/cascade', async (req, res) => {
+  try {
+    const { id } = req.params
+    const events = getRecentEvents()
+    const event = events.find((e) => e.id === id)
+    if (!event) {
+      res.status(404).json({ ok: false, error: `Event not found: ${id}` })
+      return
+    }
+    const cascade = await simulateCascade(event)
+    res.json({ ok: true, data: { event, cascade } })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/events/:id/cascade error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Scenario Simulation
+// ---------------------------------------------------------------------------
+
+router.post('/api/scenario/simulate', async (req, res) => {
+  try {
+    const { scenarioId } = req.body as { scenarioId?: string }
+    if (!scenarioId || typeof scenarioId !== 'string') {
+      res.status(400).json({ ok: false, error: 'scenarioId is required' })
+      return
+    }
+    const result = await simulateScenario(scenarioId)
+    res.json({ ok: true, data: result })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/scenario/simulate error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+router.post('/api/scenario/custom', async (req, res) => {
+  try {
+    const { description } = req.body as { description?: string }
+    if (!description || typeof description !== 'string' || description.trim().length === 0) {
+      res.status(400).json({ ok: false, error: 'description is required' })
+      return
+    }
+    const result = await simulateCustomScenario(description.trim())
+    res.json({ ok: true, data: result })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/scenario/custom error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+router.get('/api/scenario/presets', (_req, res) => {
+  try {
+    const presets = getPresetScenarios()
+    res.json({ ok: true, data: presets })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/scenario/presets error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
 // Health check
 // ---------------------------------------------------------------------------
 
@@ -598,6 +795,13 @@ router.get('/api/health', (_req, res) => {
       propertyPrices: 'available',
       developmentIndicators: 'available',
       conflict: 'available',
+      vesselTracking: 'available',
+      portData: 'available',
+      capitalFlows: 'available',
+      debtFlows: 'available',
+      eventDetector: 'available',
+      cascadeEngine: 'available',
+      scenarioEngine: 'available',
     },
   })
 })
