@@ -55,67 +55,50 @@ const globeVertexShader = `
 const globeFragmentShader = `
   uniform vec3 uSunDirection;
   uniform float uTime;
+  uniform sampler2D uDayMap;
+  uniform sampler2D uNightMap;
 
   varying vec3 vNormal;
   varying vec3 vPosition;
   varying vec2 vUv;
-
-  // Simple noise function for city lights
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-  }
-
-  float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    f = f * f * (3.0 - 2.0 * f);
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
-    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-  }
 
   void main() {
     // Sun illumination
     float sunDot = dot(vNormal, uSunDirection);
     float dayFactor = smoothstep(-0.1, 0.3, sunDot);
 
-    // Procedural ocean vs land
-    float landNoise = noise(vUv * 8.0 + vec2(3.0, 7.0));
-    float isLand = smoothstep(0.35, 0.55, landNoise);
-    vec3 oceanColor = vec3(0.01, 0.03, 0.12) * (0.5 + 0.5 * dayFactor);
-    vec3 landColor = vec3(0.04, 0.06, 0.03) * (0.5 + 0.5 * dayFactor);
-    vec3 dayColor = mix(oceanColor, landColor, isLand);
+    // Sample textures
+    vec3 dayColor = texture2D(uDayMap, vUv).rgb;
+    vec3 nightColor = texture2D(uNightMap, vUv).rgb;
 
-    // Night side: faint city lights
-    float cityNoise = noise(vUv * 120.0) * noise(vUv * 60.0 + 5.0);
-    cityNoise = pow(cityNoise, 3.0) * 2.0;
-    // Concentrate lights in "land" regions using coarse noise
-    float landMask = smoothstep(0.35, 0.55, noise(vUv * 8.0 + vec2(3.0, 7.0)));
-    float cityLights = cityNoise * landMask * (1.0 - dayFactor);
-    vec3 nightGlow = vec3(1.0, 0.85, 0.5) * cityLights * 0.8;
+    // Darken day side for moody dark-themed dashboard (multiply by ~0.45)
+    dayColor *= 0.45;
 
-    // Subtle latitude grid lines
+    // Tint nightlights warm amber/gold and boost intensity
+    vec3 nightGlow = nightColor * vec3(1.0, 0.75, 0.35) * 1.8;
+
+    // Blend day and night based on sun direction
+    vec3 surfaceColor = mix(nightGlow, dayColor, dayFactor);
+
+    // Subtle latitude/longitude grid lines
     float latLine = abs(sin(vUv.y * 3.14159 * 12.0));
     latLine = smoothstep(0.97, 1.0, latLine) * 0.03;
     float lonLine = abs(sin(vUv.x * 3.14159 * 24.0));
     lonLine = smoothstep(0.97, 1.0, lonLine) * 0.03;
     float grid = max(latLine, lonLine);
+    surfaceColor += vec3(grid) * vec3(0.15, 0.3, 0.5);
 
-    vec3 finalColor = dayColor + nightGlow + vec3(grid) * vec3(0.15, 0.3, 0.5);
-
-    // Slight terminator glow
+    // Terminator glow — subtle blue glow at the day/night boundary
     float terminatorGlow = exp(-pow((sunDot + 0.05) * 8.0, 2.0)) * 0.2;
-    finalColor += vec3(0.1, 0.2, 0.4) * terminatorGlow;
+    surfaceColor += vec3(0.1, 0.2, 0.4) * terminatorGlow;
 
     // Rim darkening (edges of sphere)
     vec3 viewDir = normalize(-vPosition);
     float rimDot = dot(viewDir, vNormal);
     float rimDarken = smoothstep(0.0, 0.4, rimDot);
-    finalColor *= rimDarken;
+    surfaceColor *= rimDarken;
 
-    gl_FragColor = vec4(finalColor, 0.92);
+    gl_FragColor = vec4(surfaceColor, 0.92);
   }
 `
 
@@ -154,6 +137,10 @@ interface EarthGlobeProps {
 export function EarthGlobe({ visible }: EarthGlobeProps) {
   const globeRef = useRef<THREE.Mesh>(null)
   const sunDirRef = useRef(new THREE.Vector3(1, 0.3, 0.5).normalize())
+
+  // Load NASA textures
+  const dayTexture = useTexture('/textures/earth-blue-marble.jpg')
+  const nightTexture = useTexture('/textures/earth-nightlights.jpg')
 
   // Country boundary lines geometry
   const boundaryGeometry = useMemo(() => {
@@ -206,8 +193,10 @@ export function EarthGlobe({ visible }: EarthGlobeProps) {
     () => ({
       uSunDirection: { value: new THREE.Vector3(1, 0.3, 0.5).normalize() },
       uTime: { value: 0 },
+      uDayMap: { value: dayTexture },
+      uNightMap: { value: nightTexture },
     }),
-    [],
+    [dayTexture, nightTexture],
   )
 
   if (!visible) return null
@@ -252,3 +241,7 @@ export function EarthGlobe({ visible }: EarthGlobeProps) {
     </group>
   )
 }
+
+// Preload textures so they start loading immediately
+useTexture.preload('/textures/earth-blue-marble.jpg')
+useTexture.preload('/textures/earth-nightlights.jpg')

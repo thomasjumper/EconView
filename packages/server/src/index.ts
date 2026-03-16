@@ -14,6 +14,7 @@ import { startCryptoPolling } from './services/coingecko.js'
 import { initializeSchema } from './services/timescaledb.js'
 import { startRecording } from './scheduler/recorder.js'
 import { startAlertMonitor } from './services/alerts.js'
+import { rateLimit } from './middleware/rate-limit.js'
 
 const app = express()
 const httpServer = createServer(app)
@@ -26,7 +27,23 @@ const io = new SocketIOServer(httpServer, {
 
 const PORT = parseInt(process.env.PORT || '3001', 10)
 
+// CORS middleware
+const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173'
+app.use((_req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin)
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept')
+  if (_req.method === 'OPTIONS') {
+    res.status(204).end()
+    return
+  }
+  next()
+})
+
 app.use(express.json())
+
+// Rate limiting on API routes
+app.use('/api', rateLimit({ windowMs: 60000, max: 120 }))
 
 // API routes
 app.use(apiRouter)

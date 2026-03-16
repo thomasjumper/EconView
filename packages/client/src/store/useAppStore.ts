@@ -38,6 +38,7 @@ interface AppState {
   showCalendar: boolean
   showCreditPanel: boolean
   showDeFiPanel: boolean
+  showWorldData: boolean
   compareNodes: string[]
   voiceEnabled: boolean
 
@@ -56,6 +57,7 @@ interface AppState {
   toggleCalendar: () => void
   toggleCreditPanel: () => void
   toggleDeFiPanel: () => void
+  toggleWorldData: () => void
   setCompareNodes: (ids: string[]) => void
   toggleVoice: () => void
   drillDown: (nodeId: string) => void
@@ -81,6 +83,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   showCalendar: false,
   showCreditPanel: false,
   showDeFiPanel: false,
+  showWorldData: false,
   compareNodes: [],
   voiceEnabled: false,
 
@@ -99,6 +102,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   toggleCalendar: () => set((s) => ({ showCalendar: !s.showCalendar })),
   toggleCreditPanel: () => set((s) => ({ showCreditPanel: !s.showCreditPanel })),
   toggleDeFiPanel: () => set((s) => ({ showDeFiPanel: !s.showDeFiPanel })),
+  toggleWorldData: () => set((s) => ({ showWorldData: !s.showWorldData })),
   setCompareNodes: (ids) => set({ compareNodes: ids }),
   toggleVoice: () => set((s) => ({ voiceEnabled: !s.voiceEnabled })),
 

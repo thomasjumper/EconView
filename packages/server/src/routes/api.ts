@@ -32,6 +32,10 @@ import { fetchSupplyChainPressure } from '../services/supply-chain.js'
 import { fetchPropertyPrices } from '../services/property.js'
 import { fetchDevelopmentIndicators } from '../services/wb-indicators.js'
 import { fetchConflictData } from '../services/conflict.js'
+import { fetchElectricityData } from '../services/electricity.js'
+import { fetchDemographics } from '../services/demographics.js'
+import { fetchFoodSecurity } from '../services/food-security.js'
+import { fetchTourism } from '../services/tourism.js'
 
 const router: RouterType = Router()
 
@@ -573,6 +577,66 @@ router.get('/api/conflict', async (_req, res) => {
 })
 
 // ---------------------------------------------------------------------------
+// Electricity / Energy Grid (Ember Climate / OWID)
+// ---------------------------------------------------------------------------
+
+router.get('/api/electricity', async (_req, res) => {
+  try {
+    const data = await fetchElectricityData()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/electricity error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Demographics / Population (World Bank)
+// ---------------------------------------------------------------------------
+
+router.get('/api/demographics', async (_req, res) => {
+  try {
+    const data = await fetchDemographics()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/demographics error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Food Security (World Bank)
+// ---------------------------------------------------------------------------
+
+router.get('/api/food-security', async (_req, res) => {
+  try {
+    const data = await fetchFoodSecurity()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/food-security error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Tourism (World Bank)
+// ---------------------------------------------------------------------------
+
+router.get('/api/tourism', async (_req, res) => {
+  try {
+    const data = await fetchTourism()
+    res.json({ ok: true, data })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[API] /api/tourism error:', message)
+    res.status(500).json({ ok: false, error: message })
+  }
+})
+
+// ---------------------------------------------------------------------------
 // Health check
 // ---------------------------------------------------------------------------
 
@@ -598,6 +662,10 @@ router.get('/api/health', (_req, res) => {
       propertyPrices: 'available',
       developmentIndicators: 'available',
       conflict: 'available',
+      electricity: 'available',
+      demographics: 'available',
+      foodSecurity: 'available',
+      tourism: 'available',
     },
   })
 })

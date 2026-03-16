@@ -9,6 +9,7 @@ const SHORTCUTS = [
   { key: 'C', description: 'Calendar' },
   { key: 'F', description: 'Financial conditions' },
   { key: 'D', description: 'DeFi dashboard' },
+  { key: 'W', description: 'World data' },
   { key: '/', description: 'Search' },
   { key: 'V', description: 'Toggle voice narration' },
   { key: '`', description: 'Debug panel' },
